@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pg_truckgo
+    environment:
+      POSTGRES_USER: truckgodbuser
+      POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+      POSTGRES_DB: truckgodb
+    ports:
+      - "8888:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:
