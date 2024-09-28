@@ -79,6 +79,7 @@ func (l *Logger) Warn(msg string, args ...any) {
 func (l *Logger) Fatal(msg string, args ...any) {
 	ctx := context.Background()
 	l.log.Log(ctx, 1007, msg, args...) // {..."level":"ERROR+999","msg":...}
+	l.Close()
 	os.Exit(1)
 }
 

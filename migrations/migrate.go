@@ -5,12 +5,10 @@ import (
 	orders "github.com/alexandear/truckgo/internal/orders/models"
 	payments "github.com/alexandear/truckgo/internal/payments/models"
 	shippings "github.com/alexandear/truckgo/internal/shippings/models"
-	"github.com/alexandear/truckgo/pkg/logging"
 	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) error {
-	logging.InitLogger()
 	err := db.AutoMigrate(
 		&auth.User{}, &auth.TypeUser{}, &auth.Driver{}, &auth.Client{}, // users
 		&orders.Order{},
