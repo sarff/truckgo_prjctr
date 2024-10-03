@@ -1,14 +1,52 @@
 services:
-  db:
+  db_auth:
     image: postgres:16
-    container_name: pg_truckgo
+    container_name: pg_truckgo_auth
     environment:
       POSTGRES_USER: truckgodbuser
       POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-      POSTGRES_DB: truckgodb
+      POSTGRES_DB: truckgodb_auth
     ports:
       - "8888:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_auth:/var/lib/postgresql/data
+  db_orders:
+    image: postgres:16
+    container_name: pg_truckgo_orders
+    environment:
+      POSTGRES_USER: truckgodbuser
+      POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+      POSTGRES_DB: truckgodb_orders
+    ports:
+      - "8888:5432"
+    volumes:
+      - postgres_orders:/var/lib/postgresql/data
+  db_payaments:
+      image: postgres:16
+      container_name: pg_truckgo_payaments
+      environment:
+        POSTGRES_USER: truckgodbuser
+        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+        POSTGRES_DB: truckgodb_payaments
+      ports:
+        - "8888:5432"
+      volumes:
+        - postgres_payments:/var/lib/postgresql/data
+  db_shippings:
+      image: postgres:16
+      container_name: pg_truckgo_shippings
+      environment:
+        POSTGRES_USER: truckgodbuser
+        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+        POSTGRES_DB: truckgodb_shippings
+      ports:
+        - "8888:5432"
+      volumes:
+        - postgres_shippings:/var/lib/postgresql/data
+
 volumes:
-  postgres_data:
+  postgres_auth:
+  postgres_orders:
+  postgres_payments:
+  postgres_shippings:
+

@@ -9,6 +9,6 @@ func InitConfig() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic("Не вдалося завантажити конфігурацію: " + err.Error())
+		panic("The configuration could not be opened: " + err.Error())
 	}
 }

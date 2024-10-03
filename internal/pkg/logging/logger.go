@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"context"
 	"github.com/spf13/viper"
 	"log/slog"
 	"os"
@@ -19,7 +18,6 @@ type LoggerInterface interface {
 	Error(msg string, args ...any)
 	Debug(msg string, args ...any)
 	Warn(msg string, args ...any)
-	Fatal(msg string, args ...any)
 	Close()
 }
 
@@ -49,7 +47,6 @@ func NewLogger() (*Logger, error) {
 	}
 
 	handler := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
-		//AddSource: true,
 		Level: slog.LevelInfo,
 	})
 
@@ -73,14 +70,6 @@ func (l *Logger) Debug(msg string, args ...any) {
 
 func (l *Logger) Warn(msg string, args ...any) {
 	l.log.Warn(msg, args...)
-}
-
-// Пасхалка для Олександра :)
-func (l *Logger) Fatal(msg string, args ...any) {
-	ctx := context.Background()
-	l.log.Log(ctx, 1007, msg, args...) // {..."level":"ERROR+999","msg":...}
-	l.Close()
-	os.Exit(1)
 }
 
 func (l *Logger) Close() {

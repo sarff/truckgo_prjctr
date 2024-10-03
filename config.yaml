@@ -4,4 +4,11 @@ sqlite_path: "./sqlite_db"
 #postgresql
 POSTGRES_USER: "truckgodbuser"
 POSTGRES_PASSWORD: "6085dc189f1444975fc8e832a2bb07c3d0816212"
-POSTGRES_DB: "truckgodb"
+#auth
+POSTGRES_DB_AUTH: "truckgodb_auth"
+#orders
+POSTGRES_DB_ORDERS: "truckgodb_orders"
+#payments
+POSTGRES_DB_PAYMENTS: "truckgodb_payaments"
+#shippings
+POSTGRES_DB_SHIPPINGS: "truckgodb_shippings"

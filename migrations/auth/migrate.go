@@ -1,19 +1,13 @@
-package migrations
+package auth
 
 import (
 	auth "github.com/alexandear/truckgo/internal/auth/models"
-	orders "github.com/alexandear/truckgo/internal/orders/models"
-	payments "github.com/alexandear/truckgo/internal/payments/models"
-	shippings "github.com/alexandear/truckgo/internal/shippings/models"
 	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&auth.User{}, &auth.TypeUser{}, &auth.Driver{}, &auth.Client{}, // users
-		&orders.Order{},
-		&payments.Payment{},
-		&shippings.Shipping{},
 	)
 
 	if err != nil {
