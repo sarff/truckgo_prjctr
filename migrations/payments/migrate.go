@@ -6,12 +6,7 @@ import (
 )
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(
+	return db.AutoMigrate(
 		&payments.Payment{},
 	)
-
-	if err != nil {
-		return err
-	}
-	return nil
 }
