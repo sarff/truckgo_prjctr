@@ -9,6 +9,6 @@ POSTGRES_DB_AUTH: "truckgodb_auth"
 #orders
 POSTGRES_DB_ORDERS: "truckgodb_orders"
 #payments
-POSTGRES_DB_PAYMENTS: "truckgodb_payaments"
+POSTGRES_DB_PAYMENTS: "truckgodb_payments"
 #shippings
 POSTGRES_DB_SHIPPINGS: "truckgodb_shippings"
