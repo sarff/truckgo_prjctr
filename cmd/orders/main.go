@@ -2,13 +2,11 @@ package main
 
 import (
 	"fmt"
+
+	"github.com/alexandear/truckgo/cmd/db"
 	"github.com/alexandear/truckgo/internal/pkg/config"
 	"github.com/alexandear/truckgo/internal/pkg/logging"
 	"github.com/alexandear/truckgo/migrations/orders"
-	"github.com/spf13/viper"
-	"gorm.io/driver/postgres"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 
 	"os"
 )
@@ -29,34 +27,9 @@ func run() error {
 	}
 	defer log.Close()
 
-	database := os.Getenv("database")
-
-	//  use sqlite for weak computers where there is no way to run docker with postgresql
-	if database != "postgresql" && database != "sqlite" {
-		return fmt.Errorf("database type: %s is not valid. Expecting `mysql` or `postgresql`", database)
-	}
-
-	var db *gorm.DB
-	if database == "sqlite" {
-		dbFile := viper.GetString("sqlite_path")
-		db, err = gorm.Open(sqlite.Open(dbFile), &gorm.Config{
-			DisableForeignKeyConstraintWhenMigrating: false,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to open sqlite: %s", dbFile)
-		}
-		log.Info("Successfully connected to sqlite")
-	} else {
-		user := viper.GetString("POSTGRES_USER")
-		pass := viper.GetString("POSTGRES_PASSWORD")
-		dbname := viper.GetString("POSTGRES_DB_ORDERS")
-
-		dsn := fmt.Sprintf("host=localhost user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Kyiv", user, pass, dbname, "8888")
-		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err != nil {
-			return fmt.Errorf("failed to connect to postgresql %s", err)
-		}
-		log.Info("Successfully connected to postgresql")
+	db, err := db.Initialize(log, "POSTGRES_DB_ORDERS")
+	if err != nil {
+		return err
 	}
 
 	err = orders.Migrate(db)
