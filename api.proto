@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package truckgo;
+
+option go_package = "github.com/alexandear/truckgo/grpcapi";
+
+service RouteService {
+    rpc CalculateRoute(RouteRequest) returns (RouteResponse);
+    rpc TestFunc(TestRequest) returns (TestResponse);
+}
+
+message RouteRequest {
+    string origin = 1;
+    string destination = 2;
+}
+
+message RouteResponse {
+    string message = 1;
+    repeated Step steps = 2;
+}
+
+message Step {
+    string instruction = 1;
+    float distance = 2;
+    int32 duration = 3;
+}
+
+message TestRequest {
+    string message = 1;
+}
+
+message TestResponse {
+    string message = 1;
+}

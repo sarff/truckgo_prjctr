@@ -1,4 +1,5 @@
 services:
+
   db_auth:
     image: postgres:16
     container_name: pg_truckgo_auth
@@ -8,8 +9,10 @@ services:
       POSTGRES_DB: truckgodb_auth
     ports:
       - "8880:5432"
+    restart: always
     volumes:
       - postgres_auth:/var/lib/postgresql/data
+
   db_orders:
     image: postgres:16
     container_name: pg_truckgo_orders
@@ -19,8 +22,10 @@ services:
       POSTGRES_DB: truckgodb_orders
     ports:
       - "8881:5432"
+    restart: always
     volumes:
       - postgres_orders:/var/lib/postgresql/data
+
   db_payments:
       image: postgres:16
       container_name: pg_truckgo_payments
@@ -30,8 +35,10 @@ services:
         POSTGRES_DB: truckgodb_payments
       ports:
         - "8882:5432"
+      restart: always
       volumes:
         - postgres_payments:/var/lib/postgresql/data
+
   db_shippings:
       image: postgres:16
       container_name: pg_truckgo_shippings
@@ -41,8 +48,20 @@ services:
         POSTGRES_DB: truckgodb_shippings
       ports:
         - "8883:5432"
+      restart: always
       volumes:
         - postgres_shippings:/var/lib/postgresql/data
+
+  shippings:
+      container_name: truckgo_shippings_server
+      build:
+        context: .
+        dockerfile: Dockerfile_ServerShippings
+      ports:
+        - "50051:50051"
+      restart: always
+      networks:
+        - app-network
 
 volumes:
   postgres_auth:
@@ -50,3 +69,6 @@ volumes:
   postgres_payments:
   postgres_shippings:
 
+networks:
+  app-network:
+    driver: bridge
