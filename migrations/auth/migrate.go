@@ -6,11 +6,9 @@ import (
 )
 
 func Migrate(db *gorm.DB) error {
-	err := db.AutoMigrate(
+	if err := db.AutoMigrate(
 		&auth.User{}, &auth.TypeUser{}, &auth.Driver{}, &auth.Client{}, // users
-	)
-
-	if err != nil {
+	); err != nil {
 		return err
 	}
 	var count int64
@@ -23,7 +21,8 @@ func Migrate(db *gorm.DB) error {
 			{Type: "customer"},
 			{Type: "driver"},
 		}
-		if err = db.Create(&users).Error; err != nil {
+
+		if err := db.Create(&users).Error; err != nil {
 			return err
 		}
 	}
