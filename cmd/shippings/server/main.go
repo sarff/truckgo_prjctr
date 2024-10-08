@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 
 	"github.com/alexandear/truckgo/internal/grpc/grpcapi"
@@ -16,8 +17,49 @@ type server struct {
 }
 
 func (s *server) CalculateRoute(ctx context.Context, req *grpcapi.RouteRequest) (*grpcapi.RouteResponse, error) {
+	fmt.Printf("Origin: %v\n", req.Origin)
+	fmt.Printf("Destination: %v\n", req.Destination)
+
+	startPoint, err := geocode(req.Origin)
+	if err != nil {
+		log.Fatalf("Error during getting origin coordinates: %v", err)
+	}
+
+	endPoint, err := geocode(req.Destination)
+	if err != nil {
+		log.Fatalf("Error during getting destination coordinates: %v", err)
+	}
+
+	fmt.Printf("Origin coordinates: %v\n", startPoint)
+	fmt.Printf("Destination coordinates: %v\n", endPoint)
+
+	featureCollection, err := calculateRoute(startPoint, endPoint)
+	if err != nil {
+		log.Fatalf("Error during route calculation: %v", err)
+	}
+
+	var steps []*grpcapi.Step
+
+	for _, feature := range featureCollection.Features {
+		for _, segment := range feature.Properties.Segments {
+			fmt.Printf("Segment Distance: %.2f meters\n", segment.Distance)
+			fmt.Printf("Segment Duration: %.2f seconds\n", segment.Duration)
+			for _, step := range segment.Steps {
+				fmt.Printf("Instruction: %s\n", step.Instruction)
+
+				step := &grpcapi.Step{
+					Distance:    float32(step.Distance / 1000),
+					Duration:    int32(step.Duration / 60),
+					Instruction: step.Instruction,
+				}
+				steps = append(steps, step)
+			}
+		}
+	}
+
 	return &grpcapi.RouteResponse{
-		Message: "Stub calculate route",
+		Message: "The route calculated successfully!",
+		Steps:   steps,
 	}, nil
 }
 func (s *server) TestFunc(ctx context.Context, req *grpcapi.TestRequest) (*grpcapi.TestResponse, error) {
