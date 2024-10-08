@@ -1,14 +1,22 @@
 log_path: "./logs/logs.json"
 sqlite_path: "./storage/sqlite_db"
+db_type: "postgresql"
 
 #postgresql
 POSTGRES_USER: "truckgodbuser"
 POSTGRES_PASSWORD: "6085dc189f1444975fc8e832a2bb07c3d0816212"
 #auth
 POSTGRES_DB_AUTH: "truckgodb_auth"
-#orders
-POSTGRES_DB_ORDERS: "truckgodb_orders"
-#payments
-POSTGRES_DB_PAYMENTS: "truckgodb_payments"
-#shippings
-POSTGRES_DB_SHIPPINGS: "truckgodb_shippings"
+POSTGRES_PORT_AUTH: "8880"
+#user
+POSTGRES_DB_USER: "truckgodb_user"
+POSTGRES_PORT_USER: "8881"
+#order
+POSTGRES_DB_ORDER: "truckgodb_order"
+POSTGRES_PORT_ORDER: "8882"
+#payment
+POSTGRES_DB_PAYMENT: "truckgodb_payment"
+POSTGRES_PORT_PAYMENT: "8883"
+#shipping
+POSTGRES_DB_SHIPPING: "truckgodb_shipping"
+POSTGRES_PORT_SHIPPING: "8883"

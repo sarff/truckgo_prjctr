@@ -1,9 +1,12 @@
 package logging
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	"log/slog"
 	"os"
+	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -27,21 +30,28 @@ type Logger struct {
 }
 
 // InitLogger - for global use
-func InitLogger() {
+func InitLogger(prefix string) (*Logger, error) {
+	var initError error
+	var slogLogger *Logger
 	once.Do(func() {
-		slogLogger, err := NewLogger()
-		if err != nil {
-			slog.Error("Failed to initialize logger", slog.String("error", err.Error()))
-			return
+		slogLogger, initError = newLogger(prefix)
+		if initError != nil {
+			slog.Error("Failed to initialize logger", slog.String("error", initError.Error()))
 		}
-		Log = slogLogger
 	})
+	return slogLogger, initError
 }
 
-func NewLogger() (*Logger, error) {
+func newLogger(prefix string) (*Logger, error) {
 	logFilePath := viper.GetString("log_path")
+	dir := filepath.Dir(logFilePath)
+	fileName := filepath.Base(logFilePath)
+	extension := filepath.Ext(fileName)
+	nameWithoutExt := strings.TrimSuffix(fileName, extension)
+	newFileName := fmt.Sprintf("%s_%s%s", prefix, nameWithoutExt, extension) // "AUTH_logs.json"
+	newPath := filepath.Join(dir, newFileName)
 
-	logFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +86,7 @@ func (l *Logger) Close() {
 	if l.logFile != nil {
 		err := l.logFile.Close()
 		if err != nil {
-			panic(err)
+			l.log.Error("Failed to close log file", slog.String("error", err.Error()))
 		}
 	}
 }

@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	grpcapi2 "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
-	"log"
 	"net"
 
 	"google.golang.org/grpc"
@@ -17,17 +17,18 @@ type server struct {
 }
 
 func (s *server) CalculateRoute(ctx context.Context, req *grpcapi2.RouteRequest) (*grpcapi2.RouteResponse, error) {
+	log, err := logging.InitLogger("TEST")
 	fmt.Printf("Origin: %v\n", req.Origin)
 	fmt.Printf("Destination: %v\n", req.Destination)
 
 	startPoint, err := geocode(req.Origin)
 	if err != nil {
-		log.Fatalf("Error during getting origin coordinates: %v", err)
+		log.Error("Error during getting origin coordinates: %v", err)
 	}
 
 	endPoint, err := geocode(req.Destination)
 	if err != nil {
-		log.Fatalf("Error during getting destination coordinates: %v", err)
+		log.Error("Error during getting destination coordinates: %v", err)
 	}
 
 	fmt.Printf("Origin coordinates: %v\n", startPoint)
@@ -35,7 +36,7 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapi2.RouteRequest)
 
 	featureCollection, err := calculateRoute(startPoint, endPoint)
 	if err != nil {
-		log.Fatalf("Error during route calculation: %v", err)
+		log.Error("Error during route calculation: %v", err)
 	}
 
 	var steps []*grpcapi2.Step
@@ -70,14 +71,15 @@ func (s *server) TestFunc(ctx context.Context, req *grpcapi2.TestRequest) (*grpc
 
 func main() {
 	config.InitConfig()
-	log, err := logging.NewLogger()
+	log, err := logging.InitLogger("TEST")
 	if err != nil {
 		panic(err)
 	}
 	defer log.Close()
 
 	// FIXME logs don't work now
-	fmt.Println("Just a test")
+	err = errors.New("something went wrong")
+	log.Info("Just a test", err) // Перевір що пишеться в лог файл... в консоль нічого не має виводити
 
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
