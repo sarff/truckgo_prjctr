@@ -5,27 +5,27 @@ import (
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/alexandear/truckgo/shipping-service/database"
+	"github.com/spf13/viper"
 
 	"os"
 )
 
+const serviceName = "SHIPPING"
+
 func main() {
+	config.InitConfig()
+	log, _ := logging.InitLogger(serviceName)
 	if err := run(); err != nil {
-		logging.InitLogger()
-		logging.Log.Info("run error:", err.Error())
+		log.Info("run error:", err.Error())
 		os.Exit(1)
 	}
+	log.Info("Successfully connected to DB")
 }
 
 func run() error {
-	config.InitConfig()
-	log, err := logging.NewLogger()
-	if err != nil {
-		panic(err)
-	}
-	defer log.Close()
-
-	db, err := database.Initialize(log, "POSTGRES_DB_SHIPPINGS")
+	dbVarName := "POSTGRES_DB_" + serviceName
+	port := viper.GetString("POSTGRES_PORT_" + serviceName)
+	db, err := database.Initialize(dbVarName, port)
 	if err != nil {
 		return err
 	}

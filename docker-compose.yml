@@ -13,50 +13,63 @@ services:
     volumes:
       - postgres_auth:/var/lib/postgresql/data
 
-  db_orders:
+  db_user:
     image: postgres:16
-    container_name: pg_truckgo_orders
+    container_name: pg_truckgo_user
     environment:
       POSTGRES_USER: truckgodbuser
       POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-      POSTGRES_DB: truckgodb_orders
+      POSTGRES_DB: truckgodb_user
     ports:
       - "8881:5432"
     restart: always
     volumes:
-      - postgres_orders:/var/lib/postgresql/data
+      - postgres_user:/var/lib/postgresql/data
 
-  db_payments:
+  db_order:
+    image: postgres:16
+    container_name: pg_truckgo_order
+    environment:
+      POSTGRES_USER: truckgodbuser
+      POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+      POSTGRES_DB: truckgodb_order
+    ports:
+      - "8882:5432"
+    restart: always
+    volumes:
+      - postgres_order:/var/lib/postgresql/data
+
+  db_payment:
       image: postgres:16
-      container_name: pg_truckgo_payments
+      container_name: pg_truckgo_payment
       environment:
         POSTGRES_USER: truckgodbuser
         POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_payments
+        POSTGRES_DB: truckgodb_payment
       ports:
-        - "8882:5432"
+        - "8883:5432"
       restart: always
       volumes:
-        - postgres_payments:/var/lib/postgresql/data
+        - postgres_payment:/var/lib/postgresql/data
 
-  db_shippings:
+  db_shipping:
       image: postgres:16
       container_name: pg_truckgo_shippings
       environment:
         POSTGRES_USER: truckgodbuser
         POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_shippings
+        POSTGRES_DB: truckgodb_shipping
       ports:
-        - "8883:5432"
+        - "8884:5432"
       restart: always
       volumes:
-        - postgres_shippings:/var/lib/postgresql/data
+        - postgres_shipping:/var/lib/postgresql/data
 
   shippings:
       container_name: truckgo_shippings_server
       build:
         context: .
-        dockerfile: Dockerfile
+        dockerfile: ./shipping-service/Dockerfile
       ports:
         - "50051:50051"
       restart: always
@@ -65,9 +78,10 @@ services:
 
 volumes:
   postgres_auth:
-  postgres_orders:
-  postgres_payments:
-  postgres_shippings:
+  postgres_user:
+  postgres_order:
+  postgres_payment:
+  postgres_shipping:
 
 networks:
   app-network:
