@@ -1,5 +1,5 @@
-log_path: "./logs.json"
-sqlite_path: "./sqlite_db"
+log_path: "./logs/logs.json"
+sqlite_path: "./storage/sqlite_db"
 
 #postgresql
 POSTGRES_USER: "truckgodbuser"
