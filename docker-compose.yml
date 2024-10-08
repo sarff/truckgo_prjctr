@@ -56,7 +56,7 @@ services:
       container_name: truckgo_shippings_server
       build:
         context: .
-        dockerfile: Dockerfile_ServerShippings
+        dockerfile: Dockerfile
       ports:
         - "50051:50051"
       restart: always
