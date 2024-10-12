@@ -36,8 +36,6 @@ func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
 		// NOTE inside docker always 5432
 		dsn := fmt.Sprintf("host=db_order user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv", user, pass, dbname)
 
-		fmt.Println(dsn)
-
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to postgresql %s", err)
