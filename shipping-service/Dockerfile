@@ -4,12 +4,17 @@ WORKDIR /app
 
 COPY ../go.mod ../go.sum ./
 RUN go mod download
+
 COPY ./shipping-service ./shipping-service
 COPY ./shared ./shared
-WORKDIR /app/shipping-service/cmd
+COPY ./config.yaml ./config.yaml
 
-RUN go build -o /app/server main.go
+RUN mkdir -p /app/logs
+
+WORKDIR /app
+
+RUN go build -o /app/shipping-service/bin/server /app/shipping-service/server/*.go
 
 EXPOSE 50051
 
-CMD ["/app/server"]
+CMD ["/app/shipping-service/bin/server"]
