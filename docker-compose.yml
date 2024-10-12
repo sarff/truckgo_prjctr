@@ -1,60 +1,68 @@
 services:
 
   db_auth:
-    image: postgres:16
-    container_name: pg_truckgo_auth
-    environment:
-      POSTGRES_USER: truckgodbuser
-      POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-      POSTGRES_DB: truckgodb_auth
-    ports:
-      - "8880:5432"
-    restart: always
-    volumes:
-      - postgres_auth:/var/lib/postgresql/data
+      image: postgres:16
+      container_name: pg_truckgo_auth
+      environment:
+        POSTGRES_USER: truckgodbuser
+        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+        POSTGRES_DB: truckgodb_auth
+      ports:
+        - "8880:5432"
+      restart: always
+      volumes:
+        - postgres_auth:/var/lib/postgresql/data
+      networks:
+        - app-network
 
   grpc-auth:
-    image: golang:1.23-alpine
-    container_name: grpc-auth
-    depends_on:
-      - db_auth
-    working_dir: /app
-    volumes:
-      - ./go.mod:/app/go.mod
-      - ./go.sum:/app/go.sum
-      - ./auth-service:/app/auth-service
-      - ./shared:/app/shared
-      - ./config.yaml:/app/config.yaml
-      - ./logs:/app/logs
-    ports:
-      - "50047:50047"
-    command: ["/bin/sh", "-c", "go build -o /app/auth-service/server /app/auth-service/cmd/main.go && chmod +x /app/auth-service/server && /app/auth-service/server"]
+      image: golang:1.23-alpine
+      container_name: grpc-auth
+      depends_on:
+        - db_auth
+      working_dir: /app
+      volumes:
+        - ./go.mod:/app/go.mod
+        - ./go.sum:/app/go.sum
+        - ./auth-service:/app/auth-service
+        - ./shared:/app/shared
+        - ./config.yaml:/app/config.yaml
+        - ./logs:/app/logs
+      networks:
+        - app-network
+      ports:
+        - "50047:50047"
+      command: ["/bin/sh", "-c", "go build -o /app/auth-service/server /app/auth-service/cmd/main.go && chmod +x /app/auth-service/server && /app/auth-service/server"]
 
   db_user:
-    image: postgres:16
-    container_name: pg_truckgo_user
-    environment:
-      POSTGRES_USER: truckgodbuser
-      POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-      POSTGRES_DB: truckgodb_user
-    ports:
-      - "8881:5432"
-    restart: always
-    volumes:
-      - postgres_user:/var/lib/postgresql/data
+      image: postgres:16
+      container_name: pg_truckgo_user
+      environment:
+        POSTGRES_USER: truckgodbuser
+        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+        POSTGRES_DB: truckgodb_user
+      ports:
+        - "8881:5432"
+      restart: always
+      volumes:
+        - postgres_user:/var/lib/postgresql/data
+      networks:
+        - app-network
 
   db_order:
-    image: postgres:16
-    container_name: pg_truckgo_order
-    environment:
-      POSTGRES_USER: truckgodbuser
-      POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-      POSTGRES_DB: truckgodb_order
-    ports:
-      - "8882:5432"
-    restart: always
-    volumes:
-      - postgres_order:/var/lib/postgresql/data
+      image: postgres:16
+      container_name: pg_truckgo_order
+      environment:
+        POSTGRES_USER: truckgodbuser
+        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
+        POSTGRES_DB: truckgodb_order
+      ports:
+        - "8882:5432"
+      restart: always
+      volumes:
+        - postgres_order:/var/lib/postgresql/data
+      networks:
+        - app-network
 
   db_payment:
       image: postgres:16
@@ -68,6 +76,8 @@ services:
       restart: always
       volumes:
         - postgres_payment:/var/lib/postgresql/data
+      networks:
+        - app-network
 
   db_shipping:
       image: postgres:16
@@ -81,6 +91,8 @@ services:
       restart: always
       volumes:
         - postgres_shipping:/var/lib/postgresql/data
+      networks:
+        - app-network
 
   shippings:
       container_name: truckgo_shippings_server
@@ -89,6 +101,17 @@ services:
         dockerfile: ./shipping-service/Dockerfile
       ports:
         - "50051:50051"
+      restart: always
+      networks:
+        - app-network
+
+  orders:
+      container_name: truckgo_orders_server
+      build:
+        context: .
+        dockerfile: ./order-service/Dockerfile
+      ports:
+        - "50052:50052"
       restart: always
       networks:
         - app-network

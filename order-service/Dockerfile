@@ -1,0 +1,20 @@
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+COPY ../go.mod ../go.sum ./
+RUN go mod download
+
+COPY ./order-service ./order-service
+COPY ../shared ./shared
+COPY ./config.yaml ./config.yaml
+
+RUN mkdir -p /app/logs
+
+WORKDIR /app/
+
+RUN go build -o /app/order-service/bin/server /app/order-service/cmd/*.go
+
+EXPOSE 50052
+
+CMD ["/app/order-service/bin/server"]
