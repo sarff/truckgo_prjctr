@@ -117,7 +117,7 @@ func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *pb.ValidateT
 // TODO: ctx
 func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
 	var user models.Auth
-	if err := s.DB.Where("id = ?", req.UserId).First(&user).Error; err != nil {
+	if err := s.DB.Where("login = ?", req.Login).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			s.Logger.Error("user not found", logging.ErrUserNotFound, err)
 			return nil, fmt.Errorf("user not found")

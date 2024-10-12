@@ -47,7 +47,7 @@ message ValidateTokenResponse {
 }
 
 message ChangePasswordRequest {
-  uint64 user_id = 1;
+  string login = 1;
   string old_password = 2;
   string new_password = 3;
 }
