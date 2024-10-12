@@ -13,6 +13,23 @@ services:
     volumes:
       - postgres_auth:/var/lib/postgresql/data
 
+  grpc-auth:
+    image: golang:1.23-alpine
+    container_name: grpc-auth
+    depends_on:
+      - db_auth
+    working_dir: /app
+    volumes:
+      - ./go.mod:/app/go.mod
+      - ./go.sum:/app/go.sum
+      - ./auth-service:/app/auth-service
+      - ./shared:/app/shared
+      - ./config.yaml:/app/config.yaml
+      - ./logs:/app/logs
+    ports:
+      - "50047:50047"
+    command: ["/bin/sh", "-c", "go build -o /app/auth-service/server /app/auth-service/cmd/main.go && chmod +x /app/auth-service/server && /app/auth-service/server"]
+
   db_user:
     image: postgres:16
     container_name: pg_truckgo_user
