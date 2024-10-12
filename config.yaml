@@ -2,13 +2,14 @@
 log_path: "./logs/logs.json"
 sqlite_path: "./storage/sqlite_db"
 db_type: "postgresql"
+JWT_SECRET: "TruckGoProjector"
 
 #PG
 POSTGRES_USER: "truckgodbuser"
 POSTGRES_PASSWORD: "6085dc189f1444975fc8e832a2bb07c3d0816212"
 #pg_auth
 POSTGRES_DB_AUTH: "truckgodb_auth"
-POSTGRES_PORT_AUTH: "5437"
+POSTGRES_PORT_AUTH: "5432"
 #pg_user
 POSTGRES_DB_USER: "truckgodb_user"
 POSTGRES_PORT_USER: "8881"

@@ -12,7 +12,6 @@ import (
 
 // for global use
 var (
-	Log  LoggerInterface
 	once sync.Once
 )
 
