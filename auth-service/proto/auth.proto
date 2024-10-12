@@ -1,0 +1,57 @@
+/*
+export PATH=/opt/homebrew/bin:$PATH
+cd ./auth-service/
+protoc --go_out=./ --go-grpc_out=./ proto/auth.proto
+ */
+syntax = "proto3";
+
+package auth;
+
+option go_package = "/generated;auth";
+
+service AuthService {
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+
+  rpc Login (LoginRequest) returns (LoginResponse);
+
+  rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse);
+
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+}
+
+message RegisterRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message RegisterResponse {
+  string message = 1;
+}
+
+message LoginRequest {
+  string login = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string token = 1;
+  string message = 2;
+}
+
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool is_valid = 1;
+}
+
+message ChangePasswordRequest {
+  string login = 1;
+  string old_password = 2;
+  string new_password = 3;
+}
+
+message ChangePasswordResponse {
+  string message = 1;
+}

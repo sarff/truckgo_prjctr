@@ -7,7 +7,6 @@ import (
 type User struct {
 	ID         uint      `gorm:"primary_key"`
 	Login      string    `gorm:"unique;not null"` // email
-	Password   string    `gorm:"not null"`
 	FullName   string    `gorm:"not null"`
 	TypeUserID uint      `gorm:"not null"`
 	TypeUser   TypeUser  `gorm:"foreignKey:TypeUserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
@@ -33,9 +32,10 @@ type Driver struct {
 }
 
 type Client struct {
-	ID      uint   `gorm:"primaryKey"`
-	UserID  uint   `gorm:"not null"`
-	User    User   `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Phone   string `gorm:"not null"`
-	Address string `gorm:"not null"`
+	ID      uint    `gorm:"primaryKey"`
+	UserID  uint    `gorm:"not null"`
+	User    User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Phone   string  `gorm:"not null"`
+	Address string  `gorm:"not null"`
+	Rating  float64 `gorm:"default:0"`
 }
