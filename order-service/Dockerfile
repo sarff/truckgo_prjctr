@@ -6,7 +6,8 @@ COPY ../go.mod ../go.sum ./
 RUN go mod download
 
 COPY ./order-service ./order-service
-COPY ../shared ./shared
+COPY ./shared ./shared
+COPY ./shipping-service ./shipping-service
 COPY ./config.yaml ./config.yaml
 
 RUN mkdir -p /app/logs

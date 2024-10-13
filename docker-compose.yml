@@ -13,7 +13,8 @@ services:
       volumes:
         - postgres_auth:/var/lib/postgresql/data
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.2
 
   grpc-auth:
       image: golang:1.23-alpine
@@ -29,7 +30,8 @@ services:
         - ./config.yaml:/app/config.yaml
         - ./logs:/app/logs
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.3
       ports:
         - "50047:50047"
       command: ["/bin/sh", "-c", "go build -o /app/auth-service/server /app/auth-service/cmd/main.go && chmod +x /app/auth-service/server && /app/auth-service/server"]
@@ -47,7 +49,8 @@ services:
       volumes:
         - postgres_user:/var/lib/postgresql/data
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.4
 
   db_order:
       image: postgres:16
@@ -62,7 +65,8 @@ services:
       volumes:
         - postgres_order:/var/lib/postgresql/data
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.5
 
   db_payment:
       image: postgres:16
@@ -77,7 +81,8 @@ services:
       volumes:
         - postgres_payment:/var/lib/postgresql/data
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.6
 
   db_shipping:
       image: postgres:16
@@ -92,7 +97,8 @@ services:
       volumes:
         - postgres_shipping:/var/lib/postgresql/data
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.7
 
   shippings:
       container_name: truckgo_shippings_server
@@ -103,7 +109,8 @@ services:
         - "50051:50051"
       restart: always
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.8
 
   orders:
       container_name: truckgo_orders_server
@@ -114,7 +121,8 @@ services:
         - "50052:50052"
       restart: always
       networks:
-        - app-network
+        app-network:
+            ipv4_address: 172.0.0.9
 
 volumes:
   postgres_auth:
@@ -126,3 +134,6 @@ volumes:
 networks:
   app-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.0.0.0/16
