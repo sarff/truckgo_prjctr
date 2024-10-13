@@ -23,20 +23,24 @@ func main() {
 		log.Info("run error:", err.Error())
 		os.Exit(1)
 	}
-	log.Info("Successfully connected to DB")
 }
 
 func run(log *logging.Logger) error {
-	// temporary disabled
-	// err := initDB()
-	// if err != nil {
-	// 	return err
-	// }
-
-	err := initGRPCServer(log)
+	err := initDB()
 	if err != nil {
 		return err
 	}
+	log.Info("Successfully connected to DB")
+
+	done := make(chan bool, 1)
+	go func() {
+		if err := initGRPCServer(log); err != nil {
+			log.Error("gRPC server error:", "GRPC", err)
+			os.Exit(1)
+		}
+		done <- true
+	}()
+	<-done
 
 	return nil
 }
