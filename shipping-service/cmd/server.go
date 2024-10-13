@@ -38,7 +38,7 @@ func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceR
 	price := priceByFormula(res.Distance)
 
 	return &grpcapiShipping.PriceResponse{
-		Message:  "The route calculated successfully!",
+		Message:  "The price calculated successfully!",
 		Price:    price,
 		Distance: res.Distance,
 		Time:     res.Time,
