@@ -104,7 +104,7 @@ services:
       container_name: truckgo_shippings_server
       build:
         context: .
-        dockerfile: ./shipping-service/Dockerfile
+        dockerfile: ./DockerfileShippings
       ports:
         - "50051:50051"
       restart: always
@@ -116,7 +116,7 @@ services:
       container_name: truckgo_orders_server
       build:
         context: .
-        dockerfile: ./order-service/Dockerfile
+        dockerfile: ./DockerfileOrders
       ports:
         - "50052:50052"
       restart: always

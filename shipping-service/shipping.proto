@@ -4,9 +4,22 @@ package truckgo;
 
 option go_package = "github.com/alexandear/truckgo/grpcapi";
 
-service RouteService {
+service ShippingService {
+    rpc CalculatePrice(PriceRequest) returns (PriceResponse);
     rpc CalculateRoute(RouteRequest) returns (RouteResponse);
     rpc TestFunc(TestRequest) returns (TestResponse);
+}
+
+message PriceRequest {
+    string origin = 1;
+    string destination = 2;
+}
+
+message PriceResponse {
+    string message = 1;
+    double price = 2;
+    double distance = 3;
+    double time = 4;
 }
 
 message RouteRequest {
@@ -17,12 +30,14 @@ message RouteRequest {
 message RouteResponse {
     string message = 1;
     repeated Step steps = 2;
+    double distance = 3;
+    double time = 4;
 }
 
 message Step {
     string instruction = 1;
-    float distance = 2;
-    int32 duration = 3;
+    double distance = 2;
+    double duration = 3;
 }
 
 message TestRequest {
