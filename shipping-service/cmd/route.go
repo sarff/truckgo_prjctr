@@ -7,10 +7,13 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+
+	"github.com/spf13/viper"
 )
 
-// TODO read from .env
-const API_KEY = "my_api_key"
+func getAPIKey() string {
+	return viper.GetString("MAP_API_KEY")
+}
 
 type GeocodeResponse struct {
 	Features []Feature `json:"features"`
@@ -69,7 +72,7 @@ type Summary struct {
 
 func geocode(address string) ([]float64, error) {
 	escapedAddress := url.QueryEscape(address)
-	url := fmt.Sprintf("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s", API_KEY, escapedAddress)
+	url := fmt.Sprintf("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s", getAPIKey(), escapedAddress)
 
 	fmt.Printf("URL = %v\n", url)
 
@@ -124,7 +127,7 @@ func calculateRoute(start, end []float64) (*FeatureCollection, error) {
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", API_KEY)
+	req.Header.Set("Authorization", getAPIKey())
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

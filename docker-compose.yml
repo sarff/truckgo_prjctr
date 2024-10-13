@@ -62,6 +62,11 @@ services:
       ports:
         - "8882:5432"
       restart: always
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
       volumes:
         - postgres_order:/var/lib/postgresql/data
       networks:
@@ -94,6 +99,11 @@ services:
       ports:
         - "8884:5432"
       restart: always
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
       volumes:
         - postgres_shipping:/var/lib/postgresql/data
       networks:
@@ -104,7 +114,11 @@ services:
       container_name: truckgo_shippings_server
       build:
         context: .
-        dockerfile: ./shipping-service/Dockerfile
+        dockerfile: ./DockerfileShippings
+      depends_on:
+        db_shipping:
+          condition: service_healthy
+          restart: true
       ports:
         - "50051:50051"
       restart: always
@@ -116,7 +130,11 @@ services:
       container_name: truckgo_orders_server
       build:
         context: .
-        dockerfile: ./order-service/Dockerfile
+        dockerfile: ./DockerfileOrders
+      depends_on:
+        db_order:
+          condition: service_healthy
+          restart: true
       ports:
         - "50052:50052"
       restart: always
