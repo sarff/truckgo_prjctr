@@ -61,14 +61,15 @@ func initDB() error {
 }
 
 func initGRPCServer(log *logging.Logger) error {
-	lis, err := net.Listen("tcp", ":50052")
+	port := viper.GetString("GRPC_PORT_" + serviceName)
+	lis, err := net.Listen("tcp", ":" + port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
 	grpcapiOrder.RegisterOrderServiceServer(grpcServer, &server{})
 
-	log.Info("gRPC server is running on port :50052")
+	log.Info("gRPC server is running on", "port", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
 	}
