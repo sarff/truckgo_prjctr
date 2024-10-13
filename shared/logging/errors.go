@@ -17,6 +17,7 @@ const (
 	//Token
 	ErrTokenGenerationFailed = "TokenGenerationFailed"
 	ErrTokenValidationFailed = "TokenValidationFailed"
+	ErrInvalidToken          = "InvalidToken"
 
 	// Info
 	MsgInfo = "INFO"

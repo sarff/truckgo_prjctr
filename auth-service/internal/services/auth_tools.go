@@ -1,7 +1,9 @@
 package services
 
 import (
+	"fmt"
 	pb "github.com/alexandear/truckgo/auth-service/generated"
+	"github.com/alexandear/truckgo/auth-service/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
@@ -18,6 +20,7 @@ type AuthServiceServer struct {
 	*gorm.DB
 	pb.UnimplementedAuthServiceServer
 	*logging.Logger
+	*models.Auth
 }
 
 func hashPassword(password string) (string, error) {
@@ -49,4 +52,16 @@ func generateJWT(login string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func (s *AuthServiceServer) checkUserByLogin(login string) error {
+	if err := s.DB.Where("login = ?", login).First(&s.Auth).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			s.Logger.Error("user not found", logging.ErrUserNotFound, err)
+			return fmt.Errorf("user with login %s not found", login)
+		}
+		s.Logger.Error("user not found", logging.ErrDBQueryFailed, err)
+		return fmt.Errorf("failed to query user: %v", err)
+	}
+	return nil
 }

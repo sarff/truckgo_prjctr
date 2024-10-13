@@ -39,7 +39,8 @@ message LoginResponse {
 }
 
 message ValidateTokenRequest {
-  string token = 1;
+  string login = 1;
+  string token = 2;
 }
 
 message ValidateTokenResponse {
@@ -48,8 +49,9 @@ message ValidateTokenResponse {
 
 message ChangePasswordRequest {
   string login = 1;
-  string old_password = 2;
-  string new_password = 3;
+  string token = 2;
+  string old_password = 3;
+  string new_password = 4;
 }
 
 message ChangePasswordResponse {
