@@ -107,7 +107,7 @@ type RouteRequest struct {
 	Coordinates [][]float64 `json:"coordinates"`
 }
 
-func calculateRoute(start, end []float64) (*FeatureCollection, error) {
+func calculateRouteByCoordinates(start, end []float64) (*FeatureCollection, error) {
 	url := "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
 
 	reqBody := RouteRequest{

@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ShippingService_CalculatePrice_FullMethodName = "/truckgo.ShippingService/CalculatePrice"
-	ShippingService_CalculateRoute_FullMethodName = "/truckgo.ShippingService/CalculateRoute"
-	ShippingService_TestFunc_FullMethodName       = "/truckgo.ShippingService/TestFunc"
+	ShippingService_CalculatePrice_FullMethodName       = "/truckgo.ShippingService/CalculatePrice"
+	ShippingService_CalculateRoute_FullMethodName       = "/truckgo.ShippingService/CalculateRoute"
+	ShippingService_FindTheNearestDriver_FullMethodName = "/truckgo.ShippingService/FindTheNearestDriver"
+	ShippingService_TestFunc_FullMethodName             = "/truckgo.ShippingService/TestFunc"
 )
 
 // ShippingServiceClient is the client API for ShippingService service.
@@ -30,6 +31,7 @@ const (
 type ShippingServiceClient interface {
 	CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
 	CalculateRoute(ctx context.Context, in *RouteRequest, opts ...grpc.CallOption) (*RouteResponse, error)
+	FindTheNearestDriver(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
 	TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
 
@@ -61,6 +63,16 @@ func (c *shippingServiceClient) CalculateRoute(ctx context.Context, in *RouteReq
 	return out, nil
 }
 
+func (c *shippingServiceClient) FindTheNearestDriver(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DriverResponse)
+	err := c.cc.Invoke(ctx, ShippingService_FindTheNearestDriver_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *shippingServiceClient) TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TestResponse)
@@ -77,6 +89,7 @@ func (c *shippingServiceClient) TestFunc(ctx context.Context, in *TestRequest, o
 type ShippingServiceServer interface {
 	CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error)
 	CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error)
+	FindTheNearestDriver(context.Context, *DriverRequest) (*DriverResponse, error)
 	TestFunc(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedShippingServiceServer()
 }
@@ -93,6 +106,9 @@ func (UnimplementedShippingServiceServer) CalculatePrice(context.Context, *Price
 }
 func (UnimplementedShippingServiceServer) CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalculateRoute not implemented")
+}
+func (UnimplementedShippingServiceServer) FindTheNearestDriver(context.Context, *DriverRequest) (*DriverResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindTheNearestDriver not implemented")
 }
 func (UnimplementedShippingServiceServer) TestFunc(context.Context, *TestRequest) (*TestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TestFunc not implemented")
@@ -154,6 +170,24 @@ func _ShippingService_CalculateRoute_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ShippingService_FindTheNearestDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DriverRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShippingServiceServer).FindTheNearestDriver(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShippingService_FindTheNearestDriver_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShippingServiceServer).FindTheNearestDriver(ctx, req.(*DriverRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ShippingService_TestFunc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TestRequest)
 	if err := dec(in); err != nil {
@@ -186,6 +220,10 @@ var ShippingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CalculateRoute",
 			Handler:    _ShippingService_CalculateRoute_Handler,
+		},
+		{
+			MethodName: "FindTheNearestDriver",
+			Handler:    _ShippingService_FindTheNearestDriver_Handler,
 		},
 		{
 			MethodName: "TestFunc",

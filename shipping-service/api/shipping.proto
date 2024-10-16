@@ -7,6 +7,7 @@ option go_package = "github.com/alexandear/truckgo/grpcapi";
 service ShippingService {
     rpc CalculatePrice(PriceRequest) returns (PriceResponse);
     rpc CalculateRoute(RouteRequest) returns (RouteResponse);
+    rpc FindTheNearestDriver(DriverRequest) returns (DriverResponse);
     rpc TestFunc(TestRequest) returns (TestResponse);
 }
 
@@ -38,6 +39,23 @@ message Step {
     string instruction = 1;
     double distance = 2;
     double duration = 3;
+}
+
+message Driver {
+    int32 id = 1;
+    string position = 2;
+}
+
+message DriverRequest {
+    string clientPosition = 1;
+    repeated Driver drivers = 2;
+}
+
+message DriverResponse {
+    int32 id = 1;
+    double distance = 2;
+    double duration = 3;
+    string message = 4;
 }
 
 message TestRequest {

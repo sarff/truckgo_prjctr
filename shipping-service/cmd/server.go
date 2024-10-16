@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	grpcapiShipping "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
@@ -67,7 +68,7 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 	fmt.Printf("Origin coordinates: %v\n", startPoint)
 	fmt.Printf("Destination coordinates: %v\n", endPoint)
 
-	featureCollection, err := calculateRoute(startPoint, endPoint)
+	featureCollection, err := calculateRouteByCoordinates(startPoint, endPoint)
 	if err != nil {
 		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during route calculation: %v", err)
 	}
@@ -99,17 +100,55 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 		steps = append(steps, step)
 	}
 
-	_ = distance
-	_ = duration
-	_ = steps
-
 	return &grpcapiShipping.RouteResponse{
-		Message: "The route calculated successfully!",
+		Message:  "The route calculated successfully!",
 		Steps:    steps,
 		Distance: distance / 1000,
 		Time:     duration / 60,
 	}, nil
 }
+
+func (s *server) FindTheNearestDriver(ctx context.Context, req *grpcapiShipping.DriverRequest) (*grpcapiShipping.DriverResponse, error) {
+	if len(req.Drivers) == 0 {
+		return nil, errors.New("no drivers were provided")
+	}
+
+	type DriverDistance struct {
+		id       int32
+		distance float64
+		time     float64
+	}
+	var minDriverDistance *DriverDistance = nil
+
+	for _, driver := range req.Drivers {
+		route, err := s.CalculateRoute(ctx, &grpcapiShipping.RouteRequest{})
+		if err == nil {
+			if minDriverDistance == nil {
+				minDriverDistance = &DriverDistance{
+					id:       driver.Id,
+					distance: route.Distance,
+					time:     route.Time,
+				}
+			} else if route.Time < minDriverDistance.time {
+				minDriverDistance.id = driver.Id
+				minDriverDistance.distance = route.Distance
+				minDriverDistance.time = route.Time
+			}
+		}
+	}
+
+	if minDriverDistance == nil {
+		return nil, errors.New("cannot find driver with min distance, addresses are incorrect")
+	}
+
+	return &grpcapiShipping.DriverResponse{
+		Id:       minDriverDistance.id,
+		Distance: minDriverDistance.distance,
+		Duration: minDriverDistance.time,
+		Message:  "Driver was found!",
+	}, nil
+}
+
 func (s *server) TestFunc(ctx context.Context, req *grpcapiShipping.TestRequest) (*grpcapiShipping.TestResponse, error) {
 	return &grpcapiShipping.TestResponse{
 		Message: "Some testing!",
