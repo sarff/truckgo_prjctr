@@ -28,14 +28,15 @@ type Driver struct {
 	License   string  `gorm:"not null"`
 	CarModel  string  `gorm:"not null"`
 	CarNumber string  `gorm:"not null"`
+	Position  string  `gorm:"not null"`
 	Rating    float64 `gorm:"default:0"`
 }
 
 type Client struct {
-	ID      uint    `gorm:"primaryKey"`
-	UserID  uint    `gorm:"not null"`
-	User    User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Phone   string  `gorm:"not null"`
-	Address string  `gorm:"not null"`
-	Rating  float64 `gorm:"default:0"`
+	ID       uint    `gorm:"primaryKey"`
+	UserID   uint    `gorm:"not null"`
+	User     User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
+	Phone    string  `gorm:"not null"`
+	Position string  `gorm:"not null"`
+	Rating   float64 `gorm:"default:0"`
 }
