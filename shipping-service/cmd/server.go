@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	grpcapiShipping "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
@@ -31,7 +32,7 @@ func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceR
 	})
 
 	if err != nil {
-		return &grpcapiShipping.PriceResponse{}, err
+		return nil, err
 	}
 
 	// TODO some smart calculations
@@ -56,35 +57,23 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 
 	startPoint, err := geocode(req.Origin)
 	if err != nil {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during getting origin coordinates: %v", err)
+		return nil, fmt.Errorf("error during getting origin coordinates: %v", err)
 	}
 
 	endPoint, err := geocode(req.Destination)
 	if err != nil {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during getting destination coordinates: %v", err)
+		return nil, fmt.Errorf("error during getting destination coordinates: %v", err)
 	}
 
 	fmt.Printf("Origin coordinates: %v\n", startPoint)
 	fmt.Printf("Destination coordinates: %v\n", endPoint)
 
-	featureCollection, err := calculateRoute(startPoint, endPoint)
-	if err != nil {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during route calculation: %v", err)
-	}
-
 	var steps []*grpcapiShipping.Step
 
-	//	NOTE only one feature, and only one properties inside feature
-	var distance float64
-	var duration float64
-
-	if len(featureCollection.Features) != 1 || len(featureCollection.Features[0].Properties.Segments) != 1 {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("incorrect output format")
+	segment, err := calculateRouteByCoordinates(startPoint, endPoint)
+	if err != nil {
+		return nil, fmt.Errorf("error during route calculation: %v", err)
 	}
-
-	segment := featureCollection.Features[0].Properties.Segments[0]
-	distance = segment.Distance
-	duration = segment.Duration
 
 	fmt.Printf("Segment Distance: %.2f meters\n", segment.Distance)
 	fmt.Printf("Segment Duration: %.2f seconds\n", segment.Duration)
@@ -99,17 +88,55 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 		steps = append(steps, step)
 	}
 
-	_ = distance
-	_ = duration
-	_ = steps
-
 	return &grpcapiShipping.RouteResponse{
-		Message: "The route calculated successfully!",
+		Message:  "The route calculated successfully!",
 		Steps:    steps,
-		Distance: distance / 1000,
-		Time:     duration / 60,
+		Distance: segment.Distance / 1000,
+		Time:     segment.Duration / 60,
 	}, nil
 }
+
+func (s *server) FindTheNearestDriver(ctx context.Context, req *grpcapiShipping.DriverRequest) (*grpcapiShipping.DriverResponse, error) {
+	if len(req.Drivers) == 0 {
+		return nil, errors.New("no drivers were provided")
+	}
+
+	type DriverDistance struct {
+		id       int32
+		distance float64
+		time     float64
+	}
+	var minDriverDistance *DriverDistance = nil
+
+	for _, driver := range req.Drivers {
+		route, err := s.CalculateRoute(ctx, &grpcapiShipping.RouteRequest{})
+		if err == nil {
+			if minDriverDistance == nil {
+				minDriverDistance = &DriverDistance{
+					id:       driver.Id,
+					distance: route.Distance,
+					time:     route.Time,
+				}
+			} else if route.Time < minDriverDistance.time {
+				minDriverDistance.id = driver.Id
+				minDriverDistance.distance = route.Distance
+				minDriverDistance.time = route.Time
+			}
+		}
+	}
+
+	if minDriverDistance == nil {
+		return nil, errors.New("cannot find driver with min distance, addresses are incorrect")
+	}
+
+	return &grpcapiShipping.DriverResponse{
+		Id:       minDriverDistance.id,
+		Distance: minDriverDistance.distance,
+		Duration: minDriverDistance.time,
+		Message:  "Driver was found!",
+	}, nil
+}
+
 func (s *server) TestFunc(ctx context.Context, req *grpcapiShipping.TestRequest) (*grpcapiShipping.TestResponse, error) {
 	return &grpcapiShipping.TestResponse{
 		Message: "Some testing!",

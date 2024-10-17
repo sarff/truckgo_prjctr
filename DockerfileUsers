@@ -1,0 +1,20 @@
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+COPY ../go.mod ../go.sum ./
+RUN go mod download
+
+COPY ./user-service ./user-service
+COPY ./shared ./shared
+COPY ./config.yaml ./config.yaml
+
+RUN mkdir -p /app/logs
+
+WORKDIR /app
+
+RUN go build -o /app/user-service/bin/server /app/user-service/cmd/*.go
+
+EXPOSE 50051
+
+CMD ["/app/user-service/bin/server"]

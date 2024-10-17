@@ -136,11 +136,28 @@ services:
           condition: service_healthy
           restart: true
       ports:
-        - "50052:50052"
+        - "50049:50049"
       restart: always
       networks:
         app-network:
             ipv4_address: 172.0.0.9
+
+  users:
+      container_name: truckgo_users_server
+      build:
+        context: .
+        dockerfile: ./DockerfileUsers
+      depends_on:
+        db_shipping:
+          condition: service_healthy
+          restart: true
+      ports:
+        - "50048:50048"
+      restart: always
+      networks:
+        app-network:
+            ipv4_address: 172.0.0.10
+
 
 volumes:
   postgres_auth:

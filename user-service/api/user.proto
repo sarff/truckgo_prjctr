@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package truckgo;
+
+option go_package = "github.com/alexandear/truckgo/grpcapi";
+
+service UserService {
+    rpc GetDrivers(DriverRequest) returns (DriverResponse);
+    rpc TestFunc(TestRequest) returns (TestResponse);
+}
+
+message DriverRequest {
+    string message = 1;
+}
+
+message Driver {
+    int32 id = 1;
+    string position = 2;
+}
+
+message DriverResponse {
+    repeated Driver drivers = 1;
+}
+
+message TestRequest {
+    string message = 1;
+}
+
+message TestResponse {
+    string message = 1;
+}
