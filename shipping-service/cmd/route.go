@@ -16,58 +16,11 @@ func getAPIKey() string {
 }
 
 type GeocodeResponse struct {
-	Features []Feature `json:"features"`
-}
-
-type Feature struct {
-	Geometry Geometry `json:"geometry"`
-}
-
-type Geometry struct {
-	Coordinates []float64 `json:"coordinates"`
-}
-
-type FeatureCollection struct {
-	Type     string     `json:"type"`
-	BBox     []float64  `json:"bbox"`
-	Features []Feature2 `json:"features"`
-}
-
-type Feature2 struct {
-	Type       string     `json:"type"`
-	Geometry   Geometry2  `json:"geometry"`
-	Properties Properties `json:"properties"`
-}
-
-type Geometry2 struct {
-	Type        string      `json:"type"`
-	Coordinates [][]float64 `json:"coordinates"`
-}
-
-type Properties struct {
-	Segments  []Segment `json:"segments"`
-	Summary   Summary   `json:"summary"`
-	WayPoints []int     `json:"way_points"`
-}
-
-type Segment struct {
-	Distance float64 `json:"distance"`
-	Duration float64 `json:"duration"`
-	Steps    []Step  `json:"steps"`
-}
-
-type Step struct {
-	Distance    float64 `json:"distance"`
-	Duration    float64 `json:"duration"`
-	Type        int     `json:"type"`
-	Instruction string  `json:"instruction"`
-	Name        string  `json:"name"`
-	WayPoints   []int   `json:"way_points"`
-}
-
-type Summary struct {
-	Distance float64 `json:"distance"`
-	Duration float64 `json:"duration"`
+	Features []struct {
+		Geometry struct {
+			Coordinates []float64 `json:"coordinates"`
+		} `json:"geometry"`
+	} `json:"features"`
 }
 
 func geocode(address string) ([]float64, error) {
@@ -107,7 +60,27 @@ type RouteRequest struct {
 	Coordinates [][]float64 `json:"coordinates"`
 }
 
-func calculateRouteByCoordinates(start, end []float64) (*FeatureCollection, error) {
+type RouteResponse struct {
+	Features []struct {
+		Properties struct {
+			Segments []Segment `json:"segments"`
+		} `json:"properties"`
+	} `json:"features"`
+}
+
+type Segment struct {
+	Distance float64 `json:"distance"`
+	Duration float64 `json:"duration"`
+	Steps    []Step  `json:"steps"`
+}
+
+type Step struct {
+	Distance    float64 `json:"distance"`
+	Duration    float64 `json:"duration"`
+	Instruction string  `json:"instruction"`
+}
+
+func calculateRouteByCoordinates(start, end []float64) (*Segment, error) {
 	url := "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
 
 	reqBody := RouteRequest{
@@ -146,10 +119,14 @@ func calculateRouteByCoordinates(start, end []float64) (*FeatureCollection, erro
 		return nil, err
 	}
 
-	var featureCollection FeatureCollection
-	if err := json.Unmarshal(body, &featureCollection); err != nil {
+	var routeResp RouteResponse
+	if err := json.Unmarshal(body, &routeResp); err != nil {
 		return nil, err
 	}
 
-	return &featureCollection, nil
+	if len(routeResp.Features) == 0 || len(routeResp.Features[0].Properties.Segments) == 0 {
+		return nil, fmt.Errorf("segments are not found")
+	}
+
+	return &routeResp.Features[0].Properties.Segments[0], nil
 }

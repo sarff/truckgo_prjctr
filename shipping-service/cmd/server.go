@@ -32,7 +32,7 @@ func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceR
 	})
 
 	if err != nil {
-		return &grpcapiShipping.PriceResponse{}, err
+		return nil, err
 	}
 
 	// TODO some smart calculations
@@ -57,35 +57,23 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 
 	startPoint, err := geocode(req.Origin)
 	if err != nil {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during getting origin coordinates: %v", err)
+		return nil, fmt.Errorf("error during getting origin coordinates: %v", err)
 	}
 
 	endPoint, err := geocode(req.Destination)
 	if err != nil {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during getting destination coordinates: %v", err)
+		return nil, fmt.Errorf("error during getting destination coordinates: %v", err)
 	}
 
 	fmt.Printf("Origin coordinates: %v\n", startPoint)
 	fmt.Printf("Destination coordinates: %v\n", endPoint)
 
-	featureCollection, err := calculateRouteByCoordinates(startPoint, endPoint)
-	if err != nil {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("error during route calculation: %v", err)
-	}
-
 	var steps []*grpcapiShipping.Step
 
-	//	NOTE only one feature, and only one properties inside feature
-	var distance float64
-	var duration float64
-
-	if len(featureCollection.Features) != 1 || len(featureCollection.Features[0].Properties.Segments) != 1 {
-		return &grpcapiShipping.RouteResponse{}, fmt.Errorf("incorrect output format")
+	segment, err := calculateRouteByCoordinates(startPoint, endPoint)
+	if err != nil {
+		return nil, fmt.Errorf("error during route calculation: %v", err)
 	}
-
-	segment := featureCollection.Features[0].Properties.Segments[0]
-	distance = segment.Distance
-	duration = segment.Duration
 
 	fmt.Printf("Segment Distance: %.2f meters\n", segment.Distance)
 	fmt.Printf("Segment Duration: %.2f seconds\n", segment.Duration)
@@ -103,8 +91,8 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 	return &grpcapiShipping.RouteResponse{
 		Message:  "The route calculated successfully!",
 		Steps:    steps,
-		Distance: distance / 1000,
-		Time:     duration / 60,
+		Distance: segment.Distance / 1000,
+		Time:     segment.Duration / 60,
 	}, nil
 }
 
