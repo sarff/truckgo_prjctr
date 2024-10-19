@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 	"fmt"
-	pb "github.com/alexandear/truckgo/auth-service/generated"
-	"github.com/alexandear/truckgo/auth-service/internal/models"
+	pb "github.com/alexandear/truckgo/auth/grpcapi"
+	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
@@ -22,6 +22,9 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 		s.Logger.Error("invalid login format", logging.ErrInvalidEmail, req.Login)
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid login format %s", req.Login))
 	}
+	if req.Typeuser != "driver" && req.Typeuser != "customer" {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.Typeuser))
+	}
 
 	err := s.checkUserByLogin(req.Login)
 	if err == nil {
@@ -38,6 +41,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 	newUser := models.Auth{
 		Login:     req.Login,
 		Password:  hashedPassword,
+		TypeUser:  req.Typeuser,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

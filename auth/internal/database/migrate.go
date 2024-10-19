@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/alexandear/truckgo/auth-service/internal/models"
+	"github.com/alexandear/truckgo/auth/internal/models"
 	"gorm.io/gorm"
 )
 

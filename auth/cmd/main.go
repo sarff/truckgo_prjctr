@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/alexandear/truckgo/auth-service/database"
-	pb "github.com/alexandear/truckgo/auth-service/generated"
-	"github.com/alexandear/truckgo/auth-service/internal/services"
+	pb "github.com/alexandear/truckgo/auth/grpcapi"
+	database2 "github.com/alexandear/truckgo/auth/internal/database"
+	"github.com/alexandear/truckgo/auth/internal/services"
 	"gorm.io/gorm"
 
 	"github.com/alexandear/truckgo/shared/config"
@@ -30,12 +30,12 @@ func main() {
 func run(log *logging.Logger) error {
 	dbVarName := "POSTGRES_DB_" + serviceName
 	port := viper.GetString("POSTGRES_PORT_" + serviceName)
-	db, err := database.Initialize(dbVarName, port)
+	db, err := database2.Initialize(dbVarName, port)
 	if err != nil {
 		return err
 	}
 
-	err = database.Migrate(db)
+	err = database2.Migrate(db)
 	if err != nil {
 		return fmt.Errorf("failed to migrate database: %s", err)
 	}

@@ -25,7 +25,7 @@ services:
       volumes:
         - ./go.mod:/app/go.mod
         - ./go.sum:/app/go.sum
-        - ./auth-service:/app/auth-service
+        - ./auth:/app/auth
         - ./shared:/app/shared
         - ./config.yaml:/app/config.yaml
         - ./logs:/app/logs
@@ -34,7 +34,7 @@ services:
             ipv4_address: 172.0.0.3
       ports:
         - "50047:50047"
-      command: ["/bin/sh", "-c", "go build -o /app/auth-service/server /app/auth-service/cmd/main.go && chmod +x /app/auth-service/server && /app/auth-service/server"]
+      command: ["/bin/sh", "-c", "go build -o /app/auth/server /app/auth/cmd/main.go && chmod +x /app/auth/server && /app/auth/server"]
 
   db_user:
       image: postgres:16
@@ -118,7 +118,6 @@ services:
       depends_on:
         db_shipping:
           condition: service_healthy
-          restart: true
       ports:
         - "50051:50051"
       restart: always
@@ -134,7 +133,6 @@ services:
       depends_on:
         db_order:
           condition: service_healthy
-          restart: true
       ports:
         - "50049:50049"
       restart: always
@@ -150,7 +148,6 @@ services:
       depends_on:
         db_shipping:
           condition: service_healthy
-          restart: true
       ports:
         - "50048:50048"
       restart: always
