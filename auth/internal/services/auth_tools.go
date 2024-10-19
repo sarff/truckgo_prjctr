@@ -2,8 +2,6 @@ package services
 
 import (
 	"fmt"
-	pb "github.com/alexandear/truckgo/auth/grpcapi"
-	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
@@ -15,13 +13,6 @@ import (
 )
 
 var jwtSecret = []byte(viper.GetString("JWT_SECRET"))
-
-type AuthServiceServer struct {
-	*gorm.DB
-	pb.UnimplementedAuthServiceServer
-	*logging.Logger
-	*models.Auth
-}
 
 func hashPassword(password string) (string, error) {
 	if len(password) < 8 {

@@ -1,16 +1,17 @@
 package database
 
 import (
-	"github.com/alexandear/truckgo/user-service/internal/models"
+	"github.com/alexandear/truckgo/user/internal/models"
 	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
-		&models.User{}, &models.TypeUser{}, &models.Driver{}, &models.Customer{}, // users
+		&models.User{}, &models.TypeUser{}, &models.Driver{}, // users
 	); err != nil {
 		return err
 	}
+
 	var count int64
 
 	db.Model(&models.TypeUser{}).Count(&count)

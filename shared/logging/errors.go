@@ -18,7 +18,8 @@ const (
 	ErrTokenGenerationFailed = "TokenGenerationFailed"
 	ErrTokenValidationFailed = "TokenValidationFailed"
 	ErrInvalidToken          = "InvalidToken"
-
+	//Phone
+	ErrInvalidPhone = "InvalidPhone"
 	// Info
 	MsgInfo = "INFO"
 )
