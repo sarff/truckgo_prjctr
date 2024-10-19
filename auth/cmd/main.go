@@ -10,7 +10,6 @@ import (
 
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"net"
 	"os"
@@ -49,9 +48,7 @@ func run(log *logging.Logger) error {
 }
 
 func initDB() (*gorm.DB, error) {
-	dbVarName := "POSTGRES_DB_" + serviceName
-	port := viper.GetString("POSTGRES_PORT_" + serviceName)
-	db, err := database.Initialize(dbVarName, port)
+	db, err := database.Initialize()
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +61,7 @@ func initDB() (*gorm.DB, error) {
 }
 
 func startGRPCServer(log *logging.Logger, db *gorm.DB) error {
-	lis, err := net.Listen("tcp", ":"+viper.GetString("GRPC_PORT_"+serviceName))
+	lis, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT_"+serviceName))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}

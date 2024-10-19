@@ -27,17 +27,17 @@ type AuthServiceServer struct {
 func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRequest) (*authpb.RegisterResponse, error) {
 	matches := regexLogin.FindAllString(req.Login, -1)
 	if len(matches) == 0 {
-		s.Logger.Error("invalid login format", logging.ErrInvalidEmail, req.Login)
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid login format %s", req.Login))
+		s.Logger.Error("invalid Login format", logging.ErrInvalidEmail, req.Login)
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid Login format %s", req.Login))
 	}
-	if req.Typeuser != "driver" && req.Typeuser != "customer" {
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.Typeuser))
+	if req.TypeUser != "driver" && req.TypeUser != "customer" {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.TypeUser))
 	}
 
 	err := s.checkUserByLogin(req.Login)
 	if err == nil {
-		s.Logger.Info("user with login %s already exists", logging.ErrUserAlreadyExists, req.Login)
-		return nil, fmt.Errorf("user with login %s already exists", req.Login)
+		s.Logger.Info("user with Login %s already exists", logging.ErrUserAlreadyExists, req.Login)
+		return nil, fmt.Errorf("user with Login %s already exists", req.Login)
 	}
 
 	hashedPassword, err := hashPassword(req.Password)
@@ -49,7 +49,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 	newUser := models.Auth{
 		Login:     req.Login,
 		Password:  hashedPassword,
-		TypeUser:  req.Typeuser,
+		TypeUser:  req.TypeUser,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -60,7 +60,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 	}
 
 	return &authpb.RegisterResponse{
-		Message: fmt.Sprintf("User registered successfully with login %s", req.Login),
+		Message: fmt.Sprintf("User registered successfully with Login %s", req.Login),
 	}, nil
 }
 
@@ -109,15 +109,15 @@ func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *authpb.Valid
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		login, exists := claims["login"].(string)
+		login, exists := claims["Login"].(string)
 		if !exists {
-			s.Logger.Error("login not found in token claims", logging.ErrInvalidToken, "login not found")
+			s.Logger.Error("Login not found in token claims", logging.ErrInvalidToken, "Login not found")
 			return &authpb.ValidateTokenResponse{
 				IsValid: false,
 			}, nil
 		}
 		if login != req.Login {
-			s.Logger.Error("wrong login for this token", logging.ErrInvalidEmail, login)
+			s.Logger.Error("wrong Login for this token", logging.ErrInvalidEmail, login)
 			return &authpb.ValidateTokenResponse{
 				IsValid: false,
 			}, nil
