@@ -57,7 +57,13 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 		return nil, err
 	}
 
-	// TODO validate status, StatusInProgress and StatusDone are valid here
+	newStatus := models.Status(request.GetStatus())
+	err = models.ValidateStatus(*order, newStatus)
+	if err != nil {
+		s.log.Error("Invalid order status", "error", err)
+		return nil, err
+	}
+
 	updates := map[string]interface{}{
 		"Status": models.Status(request.GetStatus()),
 	}
@@ -78,9 +84,15 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 		return nil, err
 	}
 
-	// TODO validate status - should be after StatusNew
+	newStatus := models.StatusAccepted
+	err = models.ValidateStatus(*order, newStatus)
+	if err != nil {
+		s.log.Error("Invalid order status", "error", err)
+		return nil, err
+	}
+
 	updates := map[string]interface{}{
-		"Status":   models.StatusAccepted,
+		"Status":   newStatus,
 		"DriverID": uint(request.GetUserId()),
 	}
 	err = s.orderRepository.Update(*order, updates)
@@ -100,9 +112,15 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 		return nil, err
 	}
 
-	// TODO validate status - should be after StatusAccepted
+	newStatus := models.StatusNew
+	err = models.ValidateStatus(*order, newStatus)
+	if err != nil {
+		s.log.Error("Invalid order status", "error", err)
+		return nil, err
+	}
+
 	updates := map[string]interface{}{
-		"Status":   models.StatusNew,
+		"Status":   newStatus,
 		"DriverID": nil,
 	}
 	err = s.orderRepository.Update(*order, updates)
@@ -122,9 +140,15 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 		return nil, err
 	}
 
-	// TODO validate status - should be after StatusNew
+	newStatus := models.StatusCancelled
+	err = models.ValidateStatus(*order, newStatus)
+	if err != nil {
+		s.log.Error("Invalid order status", "error", err)
+		return nil, err
+	}
+
 	updates := map[string]interface{}{
-		"Status": models.StatusCancelled,
+		"Status": newStatus,
 	}
 	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
@@ -143,7 +167,12 @@ func (s *server) Archive(_ context.Context, request *pb.ArchiveRequest) (*pb.Arc
 		return nil, err
 	}
 
-	// TODO validate status - should be after StatusDone
+	if order.Status != models.StatusDone {
+		err = status.Error(codes.FailedPrecondition, "In order to archive order should be done")
+		s.log.Error("Invalid order status", "error", err)
+		return nil, err
+	}
+
 	updates := map[string]interface{}{
 		"IsArchived": true,
 	}
