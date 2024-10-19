@@ -2,16 +2,15 @@ package main
 
 import (
 	"context"
-
-	grpcapiOrder "github.com/alexandear/truckgo/order-service/grpc/grpcapi"
+	"github.com/alexandear/truckgo/order-service/grpcapi"
 )
 
 type server struct {
-	grpcapiOrder.UnimplementedOrderServiceServer
+	grpcapi.UnimplementedOrderServiceServer
 }
 
-func (s *server) TestFunc(ctx context.Context, req *grpcapiOrder.TestRequest) (*grpcapiOrder.TestResponse, error) {
-	return &grpcapiOrder.TestResponse{
+func (s *server) TestFunc(ctx context.Context, req *grpcapi.TestRequest) (*grpcapi.TestResponse, error) {
+	return &grpcapi.TestResponse{
 		Message: "Some testing!",
 	}, nil
 }
