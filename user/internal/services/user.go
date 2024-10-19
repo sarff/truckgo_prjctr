@@ -2,9 +2,14 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"github.com/alexandear/truckgo/shared/logging"
 	userpb "github.com/alexandear/truckgo/user/grpcapi"
+	"github.com/alexandear/truckgo/user/internal/models"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"regexp"
 )
 
 type UserServiceServer struct {
@@ -13,7 +18,7 @@ type UserServiceServer struct {
 	*logging.Logger
 }
 
-func (s *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (*userpb.DriverResponse, error) {
+func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (*userpb.DriverResponse, error) {
 	// TODO implement getting driver ids and positions
 
 	// FIXME test currently just a test data
@@ -58,5 +63,63 @@ func (s *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (
 
 	return &userpb.DriverResponse{
 		Drivers: stubDrivers,
+	}, nil
+}
+
+var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
+
+func (u *UserServiceServer) NewCustomer(ctx context.Context, req *userpb.NewCustomerRequest) (*userpb.NewCustomerResponse, error) {
+	matches := regexPhone.FindAllString(req.Login, -1)
+	if len(matches) == 0 {
+		u.Logger.Error("invalid phone format", logging.ErrInvalidEmail, req.Phone)
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+	}
+
+	//newUser := &models.User{
+	//}
+
+	newCustomer := models.Customer{
+		Phone:  req.Phone,
+		UserID: 1,
+	}
+
+	if err := u.DB.Create(&newCustomer).Error; err != nil {
+		u.Logger.Error("failed to create user", logging.ErrDBCreateFailed, err)
+		return nil, fmt.Errorf("failed to create user: %v", err)
+	}
+
+	return &userpb.NewCustomerResponse{
+		Message: fmt.Sprintf("User with type %s - created", req.TypeUser),
+	}, nil
+}
+
+func (u *UserServiceServer) GetCustomer(ctx context.Context, req *userpb.GetCustomerRequest) (*userpb.GetCustomerResponse, error) {
+
+	return &userpb.GetCustomerResponse{
+		Customers: nil,
+	}, nil
+}
+
+func (u *UserServiceServer) NewDriver(ctx context.Context, req *userpb.NewDriverRequest) (*userpb.NewDriverResponse, error) {
+
+	return &userpb.NewDriverResponse{
+		Message: fmt.Sprintf("User with type %s - created", req.TypeUser),
+	}, nil
+}
+
+func (u *UserServiceServer) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
+	return &userpb.UpdateUserResponse{
+		Message: fmt.Sprintf("User with phone %s - updated", req.Login),
+	}, nil
+}
+func (u *UserServiceServer) GetType(ctx context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
+	return &userpb.TypeResponse{
+		TypeUser: "TODO",
+		Message:  fmt.Sprintf("User with login %s", req.Login),
+	}, nil
+}
+func (u *UserServiceServer) GetUser(ctx context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {
+	return &userpb.UserResponse{
+		Message: fmt.Sprintf("success"),
 	}, nil
 }

@@ -35,7 +35,7 @@ type UserServiceClient interface {
 	NewDriver(ctx context.Context, in *NewDriverRequest, opts ...grpc.CallOption) (*NewDriverResponse, error)
 	NewCustomer(ctx context.Context, in *NewCustomerRequest, opts ...grpc.CallOption) (*NewCustomerResponse, error)
 	GetDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
-	GetCustomers(ctx context.Context, in *CustomerRequest, opts ...grpc.CallOption) (*CustomerResponse, error)
+	GetCustomers(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	GetType(ctx context.Context, in *TypeRequest, opts ...grpc.CallOption) (*TypeResponse, error)
 	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -79,9 +79,9 @@ func (c *userServiceClient) GetDrivers(ctx context.Context, in *DriverRequest, o
 	return out, nil
 }
 
-func (c *userServiceClient) GetCustomers(ctx context.Context, in *CustomerRequest, opts ...grpc.CallOption) (*CustomerResponse, error) {
+func (c *userServiceClient) GetCustomers(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CustomerResponse)
+	out := new(GetCustomerResponse)
 	err := c.cc.Invoke(ctx, UserService_GetCustomers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ type UserServiceServer interface {
 	NewDriver(context.Context, *NewDriverRequest) (*NewDriverResponse, error)
 	NewCustomer(context.Context, *NewCustomerRequest) (*NewCustomerResponse, error)
 	GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
-	GetCustomers(context.Context, *CustomerRequest) (*CustomerResponse, error)
+	GetCustomers(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	GetType(context.Context, *TypeRequest) (*TypeResponse, error)
 	GetUser(context.Context, *UserRequest) (*UserResponse, error)
@@ -149,7 +149,7 @@ func (UnimplementedUserServiceServer) NewCustomer(context.Context, *NewCustomerR
 func (UnimplementedUserServiceServer) GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDrivers not implemented")
 }
-func (UnimplementedUserServiceServer) GetCustomers(context.Context, *CustomerRequest) (*CustomerResponse, error) {
+func (UnimplementedUserServiceServer) GetCustomers(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCustomers not implemented")
 }
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
@@ -237,7 +237,7 @@ func _UserService_GetDrivers_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _UserService_GetCustomers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CustomerRequest)
+	in := new(GetCustomerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func _UserService_GetCustomers_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: UserService_GetCustomers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetCustomers(ctx, req.(*CustomerRequest))
+		return srv.(UserServiceServer).GetCustomers(ctx, req.(*GetCustomerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
