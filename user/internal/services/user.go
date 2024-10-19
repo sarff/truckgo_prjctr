@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 	"regexp"
+	"time"
 )
 
 type UserServiceServer struct {
@@ -69,21 +70,21 @@ func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (
 var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
 
 func (u *UserServiceServer) NewCustomer(ctx context.Context, req *userpb.NewCustomerRequest) (*userpb.NewCustomerResponse, error) {
-	matches := regexPhone.FindAllString(req.Login, -1)
+	matches := regexPhone.FindAllString(req.Phone, -1)
 	if len(matches) == 0 {
-		u.Logger.Error("invalid phone format", logging.ErrInvalidEmail, req.Phone)
+		u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
 		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
 	}
 
-	//newUser := &models.User{
-	//}
-
-	newCustomer := models.Customer{
-		Phone:  req.Phone,
-		UserID: 1,
+	newUser := &models.User{
+		Login:      req.Login,
+		FullName:   req.FullName,
+		TypeUserID: 1,
+		Phone:      req.Phone,
+		CreatedAt:  time.Now(),
 	}
 
-	if err := u.DB.Create(&newCustomer).Error; err != nil {
+	if err := u.DB.Create(&newUser).Error; err != nil {
 		u.Logger.Error("failed to create user", logging.ErrDBCreateFailed, err)
 		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
@@ -101,6 +102,31 @@ func (u *UserServiceServer) GetCustomer(ctx context.Context, req *userpb.GetCust
 }
 
 func (u *UserServiceServer) NewDriver(ctx context.Context, req *userpb.NewDriverRequest) (*userpb.NewDriverResponse, error) {
+	matches := regexPhone.FindAllString(req.Phone, -1)
+	if len(matches) == 0 {
+		u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+	}
+
+	newUser := &models.User{
+		Login:      req.Login,
+		FullName:   req.FullName,
+		TypeUserID: 2,
+		Phone:      req.Phone,
+		CreatedAt:  time.Now(),
+	}
+
+	newDriver := &models.Driver{
+		User:      *newUser,
+		License:   req.License,
+		CarModel:  req.CarModel,
+		CarNumber: req.CarNumber,
+	}
+
+	if err := u.DB.Create(&newDriver).Error; err != nil {
+		u.Logger.Error("failed to create user", logging.ErrDBCreateFailed, err)
+		return nil, fmt.Errorf("failed to create user: %v", err)
+	}
 
 	return &userpb.NewDriverResponse{
 		Message: fmt.Sprintf("User with type %s - created", req.TypeUser),

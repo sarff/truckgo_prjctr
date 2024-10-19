@@ -7,10 +7,11 @@ import (
 
 func Migrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(
-		&models.User{}, &models.TypeUser{}, &models.Driver{}, &models.Customer{}, // users
+		&models.User{}, &models.TypeUser{}, &models.Driver{}, // users
 	); err != nil {
 		return err
 	}
+
 	var count int64
 
 	db.Model(&models.TypeUser{}).Count(&count)

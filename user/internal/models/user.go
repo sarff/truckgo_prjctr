@@ -11,6 +11,8 @@ type User struct {
 	TypeUserID uint      `gorm:"not null"`
 	TypeUser   TypeUser  `gorm:"foreignKey:TypeUserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	Status     bool      `gorm:"not null;default:true"`
+	Phone      string    `gorm:"not null"`
+	Rating     float64   `gorm:"default:0"`
 	CreatedAt  time.Time `gorm:"autoCreateTime"`
 	UpdatedAt  time.Time `gorm:"autoCreateTime"`
 }
@@ -29,14 +31,4 @@ type Driver struct {
 	CarModel  string `gorm:"not null"`
 	CarNumber string `gorm:"not null"`
 	//	Position  string  `gorm:"not null"`
-	Rating float64 `gorm:"default:0"`
-}
-
-type Customer struct {
-	ID     uint   `gorm:"primaryKey"`
-	UserID uint   `gorm:"not null"`
-	User   User   `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
-	Phone  string `gorm:"not null"`
-	//	Position string  `gorm:"not null"`
-	Rating float64 `gorm:"default:0"`
 }
