@@ -2,9 +2,10 @@ syntax = "proto3";
 
 package truckgo;
 
-option go_package = "github.com/alexandear/truckgo/grpcapi";
+option go_package = "/grpcapi;user";
 
 service UserService {
+    rpc IsUserAuthenticated(ValidateTokenRequest) returns (ValidateTokenResponse);
     rpc GetDrivers(DriverRequest) returns (DriverResponse);
     rpc TestFunc(TestRequest) returns (TestResponse);
 }
@@ -28,4 +29,13 @@ message TestRequest {
 
 message TestResponse {
     string message = 1;
+}
+
+message ValidateTokenRequest {
+    string login = 1;
+    string token = 2;
+}
+
+message ValidateTokenResponse {
+    bool is_valid = 1;
 }

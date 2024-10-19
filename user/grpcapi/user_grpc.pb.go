@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: user.proto
+// source: api/user.proto
 
-package grpcapi
+package user
 
 import (
 	context "context"
@@ -19,14 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_GetDrivers_FullMethodName = "/truckgo.UserService/GetDrivers"
-	UserService_TestFunc_FullMethodName   = "/truckgo.UserService/TestFunc"
+	UserService_IsUserAuthenticated_FullMethodName = "/truckgo.UserService/IsUserAuthenticated"
+	UserService_GetDrivers_FullMethodName          = "/truckgo.UserService/GetDrivers"
+	UserService_TestFunc_FullMethodName            = "/truckgo.UserService/TestFunc"
 )
 
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
+	IsUserAuthenticated(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 	GetDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
 	TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
@@ -37,6 +39,16 @@ type userServiceClient struct {
 
 func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
+}
+
+func (c *userServiceClient) IsUserAuthenticated(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ValidateTokenResponse)
+	err := c.cc.Invoke(ctx, UserService_IsUserAuthenticated_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *userServiceClient) GetDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
@@ -63,6 +75,7 @@ func (c *userServiceClient) TestFunc(ctx context.Context, in *TestRequest, opts 
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
+	IsUserAuthenticated(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
 	TestFunc(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
@@ -75,6 +88,9 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
+func (UnimplementedUserServiceServer) IsUserAuthenticated(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsUserAuthenticated not implemented")
+}
 func (UnimplementedUserServiceServer) GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDrivers not implemented")
 }
@@ -100,6 +116,24 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&UserService_ServiceDesc, srv)
+}
+
+func _UserService_IsUserAuthenticated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).IsUserAuthenticated(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_IsUserAuthenticated_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).IsUserAuthenticated(ctx, req.(*ValidateTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UserService_GetDrivers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -146,6 +180,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "IsUserAuthenticated",
+			Handler:    _UserService_IsUserAuthenticated_Handler,
+		},
+		{
 			MethodName: "GetDrivers",
 			Handler:    _UserService_GetDrivers_Handler,
 		},
@@ -155,5 +193,5 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "user.proto",
+	Metadata: "api/user.proto",
 }

@@ -9,11 +9,19 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 	"regexp"
 	"time"
 )
 
 var regexLogin = regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
+
+type AuthServiceServer struct {
+	*gorm.DB
+	pb.UnimplementedAuthServiceServer
+	*logging.Logger
+	*models.Auth
+}
 
 // TODO: ctx
 func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {

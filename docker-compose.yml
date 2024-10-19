@@ -18,7 +18,7 @@ services:
 
   grpc-auth:
       image: golang:1.23-alpine
-      container_name: grpc-auth
+      container_name: grpcapi-auth
       depends_on:
         - db_auth
       working_dir: /app
