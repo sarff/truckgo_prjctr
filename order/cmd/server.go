@@ -57,12 +57,13 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 		return nil, err
 	}
 
-	orderStatus := models.Status(request.GetStatus())
 	// TODO validate status, StatusInProgress and StatusDone are valid here
-	// TODO proper update
-	err = s.orderRepository.UpdateStatus(*order, orderStatus)
+	updates := map[string]interface{}{
+		"Status": models.Status(request.GetStatus()),
+	}
+	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
-		s.log.Error("Cannot update order status", "error", err)
+		s.log.Error("Cannot update order", "error", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -77,12 +78,14 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 		return nil, err
 	}
 
-	orderStatus := models.StatusAccepted
-	// TODO validate status - should be after StatusNew and setDriverId to user_id
-	// TODO proper update
-	err = s.orderRepository.UpdateStatus(*order, orderStatus)
+	// TODO validate status - should be after StatusNew
+	updates := map[string]interface{}{
+		"Status":   models.StatusAccepted,
+		"DriverID": uint(request.GetUserId()),
+	}
+	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
-		s.log.Error("Cannot update order status", "error", err)
+		s.log.Error("Cannot update order", "error", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -97,12 +100,14 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 		return nil, err
 	}
 
-	// TODO validate status - should be after StatusAccepted, sedDriverId to nil
-	// TODO proper update
-	orderStatus := models.StatusNew
-	err = s.orderRepository.UpdateStatus(*order, orderStatus)
+	// TODO validate status - should be after StatusAccepted
+	updates := map[string]interface{}{
+		"Status":   models.StatusNew,
+		"DriverID": nil,
+	}
+	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
-		s.log.Error("Cannot update order status", "error", err)
+		s.log.Error("Cannot update order", "error", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -118,11 +123,12 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 	}
 
 	// TODO validate status - should be after StatusNew
-	// TODO proper update
-	orderStatus := models.StatusCancelled
-	err = s.orderRepository.UpdateStatus(*order, orderStatus)
+	updates := map[string]interface{}{
+		"Status": models.StatusCancelled,
+	}
+	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
-		s.log.Error("Cannot update order status", "error", err)
+		s.log.Error("Cannot update order", "error", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
@@ -132,18 +138,20 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 
 // Archive can be done by user with type customer. The right user id and type are validated on frontend.
 func (s *server) Archive(_ context.Context, request *pb.ArchiveRequest) (*pb.ArchiveResponse, error) {
-	//order, err := s.validateOrderID(uint(request.GetOrderId()))
-	//if err != nil {
-	//	return nil, err
-	//}
+	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	if err != nil {
+		return nil, err
+	}
 
-	// TODO validate status - should be after StatusDone, isArchived set to true
-	// TODO proper update
-	//err = s.orderRepository.Update(*order)
-	//if err != nil {
-	//	s.log.Error("Cannot archive status", "error", err)
-	//	return nil, status.Error(codes.Internal, err.Error())
-	//}
+	// TODO validate status - should be after StatusDone
+	updates := map[string]interface{}{
+		"IsArchived": true,
+	}
+	err = s.orderRepository.Update(*order, updates)
+	if err != nil {
+		s.log.Error("Cannot update order", "error", err)
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	//TODO figure out what is correct response ??
 	return &pb.ArchiveResponse{}, nil
