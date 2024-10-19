@@ -19,18 +19,26 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_IsUserAuthenticated_FullMethodName = "/truckgo.UserService/IsUserAuthenticated"
-	UserService_GetDrivers_FullMethodName          = "/truckgo.UserService/GetDrivers"
-	UserService_TestFunc_FullMethodName            = "/truckgo.UserService/TestFunc"
+	UserService_NewDriver_FullMethodName    = "/truckgo.UserService/NewDriver"
+	UserService_NewCustomer_FullMethodName  = "/truckgo.UserService/NewCustomer"
+	UserService_GetDrivers_FullMethodName   = "/truckgo.UserService/GetDrivers"
+	UserService_GetCustomers_FullMethodName = "/truckgo.UserService/GetCustomers"
+	UserService_UpdateUser_FullMethodName   = "/truckgo.UserService/UpdateUser"
+	UserService_GetType_FullMethodName      = "/truckgo.UserService/GetType"
+	UserService_GetUser_FullMethodName      = "/truckgo.UserService/GetUser"
 )
 
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	IsUserAuthenticated(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
+	NewDriver(ctx context.Context, in *NewDriverRequest, opts ...grpc.CallOption) (*NewDriverResponse, error)
+	NewCustomer(ctx context.Context, in *NewCustomerRequest, opts ...grpc.CallOption) (*NewCustomerResponse, error)
 	GetDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
-	TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
+	GetCustomers(ctx context.Context, in *CustomerRequest, opts ...grpc.CallOption) (*CustomerResponse, error)
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
+	GetType(ctx context.Context, in *TypeRequest, opts ...grpc.CallOption) (*TypeResponse, error)
+	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
 type userServiceClient struct {
@@ -41,10 +49,20 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) IsUserAuthenticated(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error) {
+func (c *userServiceClient) NewDriver(ctx context.Context, in *NewDriverRequest, opts ...grpc.CallOption) (*NewDriverResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ValidateTokenResponse)
-	err := c.cc.Invoke(ctx, UserService_IsUserAuthenticated_FullMethodName, in, out, cOpts...)
+	out := new(NewDriverResponse)
+	err := c.cc.Invoke(ctx, UserService_NewDriver_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) NewCustomer(ctx context.Context, in *NewCustomerRequest, opts ...grpc.CallOption) (*NewCustomerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NewCustomerResponse)
+	err := c.cc.Invoke(ctx, UserService_NewCustomer_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,10 +79,40 @@ func (c *userServiceClient) GetDrivers(ctx context.Context, in *DriverRequest, o
 	return out, nil
 }
 
-func (c *userServiceClient) TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
+func (c *userServiceClient) GetCustomers(ctx context.Context, in *CustomerRequest, opts ...grpc.CallOption) (*CustomerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TestResponse)
-	err := c.cc.Invoke(ctx, UserService_TestFunc_FullMethodName, in, out, cOpts...)
+	out := new(CustomerResponse)
+	err := c.cc.Invoke(ctx, UserService_GetCustomers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateUserResponse)
+	err := c.cc.Invoke(ctx, UserService_UpdateUser_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetType(ctx context.Context, in *TypeRequest, opts ...grpc.CallOption) (*TypeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TypeResponse)
+	err := c.cc.Invoke(ctx, UserService_GetType_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserResponse)
+	err := c.cc.Invoke(ctx, UserService_GetUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +123,13 @@ func (c *userServiceClient) TestFunc(ctx context.Context, in *TestRequest, opts 
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
-	IsUserAuthenticated(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
+	NewDriver(context.Context, *NewDriverRequest) (*NewDriverResponse, error)
+	NewCustomer(context.Context, *NewCustomerRequest) (*NewCustomerResponse, error)
 	GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
-	TestFunc(context.Context, *TestRequest) (*TestResponse, error)
+	GetCustomers(context.Context, *CustomerRequest) (*CustomerResponse, error)
+	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
+	GetType(context.Context, *TypeRequest) (*TypeResponse, error)
+	GetUser(context.Context, *UserRequest) (*UserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -88,14 +140,26 @@ type UserServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedUserServiceServer struct{}
 
-func (UnimplementedUserServiceServer) IsUserAuthenticated(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsUserAuthenticated not implemented")
+func (UnimplementedUserServiceServer) NewDriver(context.Context, *NewDriverRequest) (*NewDriverResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewDriver not implemented")
+}
+func (UnimplementedUserServiceServer) NewCustomer(context.Context, *NewCustomerRequest) (*NewCustomerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewCustomer not implemented")
 }
 func (UnimplementedUserServiceServer) GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetDrivers not implemented")
 }
-func (UnimplementedUserServiceServer) TestFunc(context.Context, *TestRequest) (*TestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TestFunc not implemented")
+func (UnimplementedUserServiceServer) GetCustomers(context.Context, *CustomerRequest) (*CustomerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomers not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
+}
+func (UnimplementedUserServiceServer) GetType(context.Context, *TypeRequest) (*TypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetType not implemented")
+}
+func (UnimplementedUserServiceServer) GetUser(context.Context, *UserRequest) (*UserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -118,20 +182,38 @@ func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
 	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _UserService_IsUserAuthenticated_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateTokenRequest)
+func _UserService_NewDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewDriverRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).IsUserAuthenticated(ctx, in)
+		return srv.(UserServiceServer).NewDriver(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_IsUserAuthenticated_FullMethodName,
+		FullMethod: UserService_NewDriver_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).IsUserAuthenticated(ctx, req.(*ValidateTokenRequest))
+		return srv.(UserServiceServer).NewDriver(ctx, req.(*NewDriverRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_NewCustomer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NewCustomerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).NewCustomer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_NewCustomer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).NewCustomer(ctx, req.(*NewCustomerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -154,20 +236,74 @@ func _UserService_GetDrivers_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_TestFunc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TestRequest)
+func _UserService_GetCustomers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CustomerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).TestFunc(ctx, in)
+		return srv.(UserServiceServer).GetCustomers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_TestFunc_FullMethodName,
+		FullMethod: UserService_GetCustomers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).TestFunc(ctx, req.(*TestRequest))
+		return srv.(UserServiceServer).GetCustomers(ctx, req.(*CustomerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UpdateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUser(ctx, req.(*UpdateUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetType_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetType(ctx, req.(*TypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUser(ctx, req.(*UserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -180,16 +316,32 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "IsUserAuthenticated",
-			Handler:    _UserService_IsUserAuthenticated_Handler,
+			MethodName: "NewDriver",
+			Handler:    _UserService_NewDriver_Handler,
+		},
+		{
+			MethodName: "NewCustomer",
+			Handler:    _UserService_NewCustomer_Handler,
 		},
 		{
 			MethodName: "GetDrivers",
 			Handler:    _UserService_GetDrivers_Handler,
 		},
 		{
-			MethodName: "TestFunc",
-			Handler:    _UserService_TestFunc_Handler,
+			MethodName: "GetCustomers",
+			Handler:    _UserService_GetCustomers_Handler,
+		},
+		{
+			MethodName: "UpdateUser",
+			Handler:    _UserService_UpdateUser_Handler,
+		},
+		{
+			MethodName: "GetType",
+			Handler:    _UserService_GetType_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _UserService_GetUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

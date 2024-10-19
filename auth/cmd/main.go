@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/alexandear/truckgo/auth/grpcapi"
-	database2 "github.com/alexandear/truckgo/auth/internal/database"
+	authpb "github.com/alexandear/truckgo/auth/grpcapi"
+	"github.com/alexandear/truckgo/auth/internal/database"
 	"github.com/alexandear/truckgo/auth/internal/services"
+
 	"gorm.io/gorm"
 
 	"github.com/alexandear/truckgo/shared/config"
@@ -28,22 +29,15 @@ func main() {
 }
 
 func run(log *logging.Logger) error {
-	dbVarName := "POSTGRES_DB_" + serviceName
-	port := viper.GetString("POSTGRES_PORT_" + serviceName)
-	db, err := database2.Initialize(dbVarName, port)
+	dbs, err := initDB()
 	if err != nil {
 		return err
-	}
-
-	err = database2.Migrate(db)
-	if err != nil {
-		return fmt.Errorf("failed to migrate database: %s", err)
 	}
 
 	done := make(chan bool, 1)
 	//TODO: add ctx
 	go func() {
-		if err = startGRPCServer(log, db); err != nil {
+		if err = startGRPCServer(log, dbs); err != nil {
 			log.Error("gRPC server error:", "GRPC", err)
 			os.Exit(1)
 		}
@@ -54,6 +48,21 @@ func run(log *logging.Logger) error {
 	return nil
 }
 
+func initDB() (*gorm.DB, error) {
+	dbVarName := "POSTGRES_DB_" + serviceName
+	port := viper.GetString("POSTGRES_PORT_" + serviceName)
+	db, err := database.Initialize(dbVarName, port)
+	if err != nil {
+		return nil, err
+	}
+
+	err = database.Migrate(db)
+	if err != nil {
+		return nil, fmt.Errorf("failed to migrate database: %s", err)
+	}
+	return db, nil
+}
+
 func startGRPCServer(log *logging.Logger, db *gorm.DB) error {
 	lis, err := net.Listen("tcp", ":"+viper.GetString("GRPC_PORT_"+serviceName))
 	if err != nil {
@@ -61,7 +70,7 @@ func startGRPCServer(log *logging.Logger, db *gorm.DB) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterAuthServiceServer(grpcServer, &services.AuthServiceServer{
+	authpb.RegisterAuthServiceServer(grpcServer, &services.AuthServiceServer{
 		Logger: log,
 		DB:     db,
 	})

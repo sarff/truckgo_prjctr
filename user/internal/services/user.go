@@ -3,21 +3,21 @@ package services
 import (
 	"context"
 	"github.com/alexandear/truckgo/shared/logging"
-	pb "github.com/alexandear/truckgo/user/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 	"gorm.io/gorm"
 )
 
 type UserServiceServer struct {
 	*gorm.DB
-	pb.UnimplementedUserServiceServer
+	userpb.UnimplementedUserServiceServer
 	*logging.Logger
 }
 
-func (s *UserServiceServer) GetDrivers(context.Context, *pb.DriverRequest) (*pb.DriverResponse, error) {
+func (s *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (*userpb.DriverResponse, error) {
 	// TODO implement getting driver ids and positions
 
 	// FIXME test currently just a test data
-	stubDrivers := []*pb.Driver{
+	stubDrivers := []*userpb.Driver{
 		{
 			Id:       1,
 			Position: "метро Оболонь, Київ",
@@ -56,13 +56,7 @@ func (s *UserServiceServer) GetDrivers(context.Context, *pb.DriverRequest) (*pb.
 		},
 	}
 
-	return &pb.DriverResponse{
+	return &userpb.DriverResponse{
 		Drivers: stubDrivers,
-	}, nil
-}
-
-func (s *UserServiceServer) TestFunc(context.Context, *pb.TestRequest) (*pb.TestResponse, error) {
-	return &pb.TestResponse{
-		Message: "Some testing!",
 	}, nil
 }

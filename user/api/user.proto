@@ -5,9 +5,37 @@ package truckgo;
 option go_package = "/grpcapi;user";
 
 service UserService {
-    rpc IsUserAuthenticated(ValidateTokenRequest) returns (ValidateTokenResponse);
+    rpc NewDriver(NewDriverRequest) returns (NewDriverResponse);
+    rpc NewCustomer(NewCustomerRequest) returns (NewCustomerResponse);
     rpc GetDrivers(DriverRequest) returns (DriverResponse);
-    rpc TestFunc(TestRequest) returns (TestResponse);
+    rpc GetCustomers(CustomerRequest) returns (CustomerResponse);
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
+    rpc GetType(TypeRequest) returns (TypeResponse);
+    rpc GetUser(UserRequest) returns (UserResponse);
+}
+
+message NewDriverRequest {
+    string Login = 1;
+    string FullName = 2;
+    string TypeUser = 3;
+    string License = 4;
+    string CarModel = 5;
+    string CarNumber = 6;
+}
+
+message NewDriverResponse {
+    string message = 1;
+}
+
+message NewCustomerRequest {
+    string Login = 1;
+    string FullName = 2;
+    string TypeUser = 3;
+    string Phone = 4;
+}
+
+message NewCustomerResponse {
+    string message = 1;
 }
 
 message DriverRequest {
@@ -23,19 +51,45 @@ message DriverResponse {
     repeated Driver drivers = 1;
 }
 
-message TestRequest {
+message CustomerRequest {
+    //  nil
+}
+
+message Customer {
+    int32 id = 1;
+}
+
+message CustomerResponse {
+    repeated Customer customers = 1;
+}
+
+message UpdateUserRequest {
+    string Login = 1;
+    string FullName = 2;
+    string License = 3;
+    string CarModel = 4;
+    string CarNumber = 5;
+    string Phone = 6;
+
+}
+
+message UpdateUserResponse {
     string message = 1;
 }
 
-message TestResponse {
+message TypeRequest {
+    string Login = 1;
+}
+
+message TypeResponse {
+    string TypeUser = 1;
+    string message = 2;
+}
+
+message UserRequest {
+
+}
+
+message UserResponse {
     string message = 1;
-}
-
-message ValidateTokenRequest {
-    string login = 1;
-    string token = 2;
-}
-
-message ValidateTokenResponse {
-    bool is_valid = 1;
 }
