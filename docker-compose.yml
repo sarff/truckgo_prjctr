@@ -4,11 +4,11 @@ services:
       image: postgres:16
       container_name: pg_truckgo_auth
       environment:
-        POSTGRES_USER: truckgodbuser
-        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_auth
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB_AUTH}
       ports:
-        - "8880:5432"
+        - "${DB_AUTH_PORT}:5432"
       restart: always
       volumes:
         - postgres_auth:/var/lib/postgresql/data
@@ -28,12 +28,13 @@ services:
         - ./auth:/app/auth
         - ./shared:/app/shared
         - ./config.yaml:/app/config.yaml
+        - ./.env:/app/.env
         - ./logs:/app/logs
       networks:
         app-network:
             ipv4_address: 172.0.0.3
       ports:
-        - "50047:50047"
+        - "${GRPC_PORT_AUTH}:${GRPC_PORT_AUTH}"
       command: ["/bin/sh", "-c", "go build -o /app/auth/server /app/auth/cmd/main.go && chmod +x /app/auth/server && /app/auth/server"]
 
   db_user:

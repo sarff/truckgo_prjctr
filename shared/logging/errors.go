@@ -9,17 +9,13 @@ const (
 	ErrDBQueryFailed  = "DBQueryFailed"
 	ErrDBCreateFailed = "DBCreateFailed"
 	ErrDBUpdateFailed = "DBUpdateFailed"
-	ErrDBDeleteFailed = "DBDeleteFailed"
 	// Password
 	ErrInvalidPassword       = "InvalidPassword"
 	ErrPasswordHashingFailed = "PasswordHashingFailed"
-	ErrPasswordUpdateFailed  = "PasswordUpdateFailed"
 	//Token
 	ErrTokenGenerationFailed = "TokenGenerationFailed"
 	ErrTokenValidationFailed = "TokenValidationFailed"
 	ErrInvalidToken          = "InvalidToken"
 	//Phone
 	ErrInvalidPhone = "InvalidPhone"
-	// Info
-	MsgInfo = "INFO"
 )
