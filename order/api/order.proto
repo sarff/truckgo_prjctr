@@ -12,87 +12,95 @@ service Order {
   rpc Cancel(CancelRequest) returns (CancelResponse);
   rpc Archive(ArchiveRequest) returns (ArchiveResponse);
   rpc GetOne(GetOneRequest) returns (GetOneResponse);
-  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
-  rpc GetAll(GetAllRequest) returns (GetAllResponse);
+  rpc GetHistoryByUser(GetHistoryByUserRequest) returns (GetHistoryByUserResponse);
+  rpc GetAllByUser(GetAllByUserRequest) returns (GetAllByUserResponse);
 }
 
 message CreateRequest {
-  OrderEntity order = 1;
+  uint32 user_id = 1;
+  string origin = 2;
+  string destination = 3;
 }
 
 message CreateResponse {
-  int32  order_id = 1;
+  uint32  order_id = 1;
 }
 
 message UpdateStatusRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+  uint32 order_id = 1;
+  int32 status = 2;
 }
 
 message UpdateStatusResponse {
 }
 
 message AcceptRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+  uint32 order_id = 1;
+  uint32 user_id = 2;
 }
 
 message AcceptResponse {
 }
 
 message DeclineRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+  uint32 order_id = 1;
 }
 
 message DeclineResponse {
 }
 
 message CancelRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+  uint32 order_id = 1;
 }
 
 message CancelResponse {
 }
 
 message ArchiveRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+  uint32 order_id = 1;
 }
 
 message ArchiveResponse {
 }
 
 message GetOneRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+  uint32 order_id = 1;
 }
 
 message GetOneResponse {
   OrderEntity order = 1;
 }
 
-message GetHistoryRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+message GetHistoryByUserRequest {
+  uint32 user_id = 1;
+  bool include_archived = 2;
 }
 
-message GetHistoryResponse {
+message GetHistoryByUserResponse {
   repeated OrderEntity orders = 1;
 }
 
-message GetAllRequest {
-  int32 order_id = 1;
-  int32 user_id = 2;
+message GetAllByUserRequest {
+  uint32 user_id = 1;
+  Status status_filter = 2;
 }
 
-message GetAllResponse {
+message GetAllByUserResponse {
   repeated OrderEntity orders = 1;
 }
 
 message OrderEntity {
-  string Number = 1;
-  int32 Status = 2;
-  float Price = 3;
+  string number = 1;
+  Status status = 2;
+  double price = 3;
+  uint32 user_id = 4;
+  uint32 driver_id = 5;
+}
+
+enum Status {
+  STATUS_NEW = 0;
+  STATUS_ACCEPTED = 1;
+  STATUS_IN_PROGRESS = 2;
+  STATUS_DONE = 3;
+  STATUS_CANCELLED = 4;
 }

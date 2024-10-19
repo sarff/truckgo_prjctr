@@ -19,15 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Order_Create_FullMethodName       = "/truckgo.Order/Create"
-	Order_UpdateStatus_FullMethodName = "/truckgo.Order/UpdateStatus"
-	Order_Accept_FullMethodName       = "/truckgo.Order/Accept"
-	Order_Decline_FullMethodName      = "/truckgo.Order/Decline"
-	Order_Cancel_FullMethodName       = "/truckgo.Order/Cancel"
-	Order_Archive_FullMethodName      = "/truckgo.Order/Archive"
-	Order_GetOne_FullMethodName       = "/truckgo.Order/GetOne"
-	Order_GetHistory_FullMethodName   = "/truckgo.Order/GetHistory"
-	Order_GetAll_FullMethodName       = "/truckgo.Order/GetAll"
+	Order_Create_FullMethodName           = "/truckgo.Order/Create"
+	Order_UpdateStatus_FullMethodName     = "/truckgo.Order/UpdateStatus"
+	Order_Accept_FullMethodName           = "/truckgo.Order/Accept"
+	Order_Decline_FullMethodName          = "/truckgo.Order/Decline"
+	Order_Cancel_FullMethodName           = "/truckgo.Order/Cancel"
+	Order_Archive_FullMethodName          = "/truckgo.Order/Archive"
+	Order_GetOne_FullMethodName           = "/truckgo.Order/GetOne"
+	Order_GetHistoryByUser_FullMethodName = "/truckgo.Order/GetHistoryByUser"
+	Order_GetAllByUser_FullMethodName     = "/truckgo.Order/GetAllByUser"
 )
 
 // OrderClient is the client API for Order service.
@@ -41,8 +41,8 @@ type OrderClient interface {
 	Cancel(ctx context.Context, in *CancelRequest, opts ...grpc.CallOption) (*CancelResponse, error)
 	Archive(ctx context.Context, in *ArchiveRequest, opts ...grpc.CallOption) (*ArchiveResponse, error)
 	GetOne(ctx context.Context, in *GetOneRequest, opts ...grpc.CallOption) (*GetOneResponse, error)
-	GetHistory(ctx context.Context, in *GetHistoryRequest, opts ...grpc.CallOption) (*GetHistoryResponse, error)
-	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	GetHistoryByUser(ctx context.Context, in *GetHistoryByUserRequest, opts ...grpc.CallOption) (*GetHistoryByUserResponse, error)
+	GetAllByUser(ctx context.Context, in *GetAllByUserRequest, opts ...grpc.CallOption) (*GetAllByUserResponse, error)
 }
 
 type orderClient struct {
@@ -123,20 +123,20 @@ func (c *orderClient) GetOne(ctx context.Context, in *GetOneRequest, opts ...grp
 	return out, nil
 }
 
-func (c *orderClient) GetHistory(ctx context.Context, in *GetHistoryRequest, opts ...grpc.CallOption) (*GetHistoryResponse, error) {
+func (c *orderClient) GetHistoryByUser(ctx context.Context, in *GetHistoryByUserRequest, opts ...grpc.CallOption) (*GetHistoryByUserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetHistoryResponse)
-	err := c.cc.Invoke(ctx, Order_GetHistory_FullMethodName, in, out, cOpts...)
+	out := new(GetHistoryByUserResponse)
+	err := c.cc.Invoke(ctx, Order_GetHistoryByUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *orderClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+func (c *orderClient) GetAllByUser(ctx context.Context, in *GetAllByUserRequest, opts ...grpc.CallOption) (*GetAllByUserResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAllResponse)
-	err := c.cc.Invoke(ctx, Order_GetAll_FullMethodName, in, out, cOpts...)
+	out := new(GetAllByUserResponse)
+	err := c.cc.Invoke(ctx, Order_GetAllByUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -154,8 +154,8 @@ type OrderServer interface {
 	Cancel(context.Context, *CancelRequest) (*CancelResponse, error)
 	Archive(context.Context, *ArchiveRequest) (*ArchiveResponse, error)
 	GetOne(context.Context, *GetOneRequest) (*GetOneResponse, error)
-	GetHistory(context.Context, *GetHistoryRequest) (*GetHistoryResponse, error)
-	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	GetHistoryByUser(context.Context, *GetHistoryByUserRequest) (*GetHistoryByUserResponse, error)
+	GetAllByUser(context.Context, *GetAllByUserRequest) (*GetAllByUserResponse, error)
 	mustEmbedUnimplementedOrderServer()
 }
 
@@ -187,11 +187,11 @@ func (UnimplementedOrderServer) Archive(context.Context, *ArchiveRequest) (*Arch
 func (UnimplementedOrderServer) GetOne(context.Context, *GetOneRequest) (*GetOneResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOne not implemented")
 }
-func (UnimplementedOrderServer) GetHistory(context.Context, *GetHistoryRequest) (*GetHistoryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetHistory not implemented")
+func (UnimplementedOrderServer) GetHistoryByUser(context.Context, *GetHistoryByUserRequest) (*GetHistoryByUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHistoryByUser not implemented")
 }
-func (UnimplementedOrderServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+func (UnimplementedOrderServer) GetAllByUser(context.Context, *GetAllByUserRequest) (*GetAllByUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllByUser not implemented")
 }
 func (UnimplementedOrderServer) mustEmbedUnimplementedOrderServer() {}
 func (UnimplementedOrderServer) testEmbeddedByValue()               {}
@@ -340,38 +340,38 @@ func _Order_GetOne_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Order_GetHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetHistoryRequest)
+func _Order_GetHistoryByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHistoryByUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrderServer).GetHistory(ctx, in)
+		return srv.(OrderServer).GetHistoryByUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Order_GetHistory_FullMethodName,
+		FullMethod: Order_GetHistoryByUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServer).GetHistory(ctx, req.(*GetHistoryRequest))
+		return srv.(OrderServer).GetHistoryByUser(ctx, req.(*GetHistoryByUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Order_GetAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllRequest)
+func _Order_GetAllByUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllByUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(OrderServer).GetAll(ctx, in)
+		return srv.(OrderServer).GetAllByUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Order_GetAll_FullMethodName,
+		FullMethod: Order_GetAllByUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(OrderServer).GetAll(ctx, req.(*GetAllRequest))
+		return srv.(OrderServer).GetAllByUser(ctx, req.(*GetAllByUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -412,12 +412,12 @@ var Order_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Order_GetOne_Handler,
 		},
 		{
-			MethodName: "GetHistory",
-			Handler:    _Order_GetHistory_Handler,
+			MethodName: "GetHistoryByUser",
+			Handler:    _Order_GetHistoryByUser_Handler,
 		},
 		{
-			MethodName: "GetAll",
-			Handler:    _Order_GetAll_Handler,
+			MethodName: "GetAllByUser",
+			Handler:    _Order_GetAllByUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

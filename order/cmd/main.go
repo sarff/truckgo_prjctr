@@ -70,7 +70,7 @@ func initGRPCServer(db *gorm.DB, log *logging.Logger) error {
 	}
 	grpcServer := grpc.NewServer()
 	orderRepository := repository.NewOrderRepository(db)
-	grpcapiOrder.RegisterOrderServer(grpcServer, &server{db: db, orderRepository: orderRepository})
+	grpcapiOrder.RegisterOrderServer(grpcServer, &server{log: log, orderRepository: orderRepository})
 
 	log.Info("gRPC server is running on", "port", port)
 	if err := grpcServer.Serve(lis); err != nil {
