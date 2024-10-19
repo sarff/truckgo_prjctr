@@ -2,8 +2,8 @@ package services
 
 import (
 	"fmt"
-	pb "github.com/alexandear/truckgo/auth-service/generated"
-	"github.com/alexandear/truckgo/auth-service/internal/models"
+	pb "github.com/alexandear/truckgo/auth/grpcapi"
+	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"

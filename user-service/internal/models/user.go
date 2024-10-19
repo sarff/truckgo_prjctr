@@ -32,7 +32,7 @@ type Driver struct {
 	Rating    float64 `gorm:"default:0"`
 }
 
-type Client struct {
+type Customer struct {
 	ID       uint    `gorm:"primaryKey"`
 	UserID   uint    `gorm:"not null"`
 	User     User    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`

@@ -43,6 +43,19 @@ func InitLogger(prefix string) (*Logger, error) {
 
 func newLogger(prefix string) (*Logger, error) {
 	logFilePath := viper.GetString("log_path")
+	logLevel := viper.GetString("log_level")
+	level := slog.LevelInfo
+	switch logLevel {
+	case "debug":
+		level = slog.LevelDebug
+	case "warn":
+		level = slog.LevelWarn
+	case "error":
+		level = slog.LevelError
+	default:
+		level = slog.LevelInfo
+	}
+
 	dir := filepath.Dir(logFilePath)
 	fileName := filepath.Base(logFilePath)
 	extension := filepath.Ext(fileName)
@@ -55,9 +68,16 @@ func newLogger(prefix string) (*Logger, error) {
 		return nil, err
 	}
 
-	handler := slog.NewJSONHandler(logFile, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
-	})
+	var handler slog.Handler
+	if level == slog.LevelDebug {
+		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			Level: level,
+		})
+	} else {
+		handler = slog.NewJSONHandler(logFile, &slog.HandlerOptions{
+			Level: level,
+		})
+	}
 
 	return &Logger{
 		log:     slog.New(handler),

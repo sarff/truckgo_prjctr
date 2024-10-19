@@ -1,5 +1,6 @@
 #COMMON
 log_path: "./logs/logs.json"
+log_level: "debug"
 sqlite_path: "./storage/sqlite_db"
 db_type: "postgresql"
 JWT_SECRET: "TruckGoProjector"

@@ -1,3 +1,3 @@
 .vscode
 logs/
-/auth-service/server
+/auth/server
