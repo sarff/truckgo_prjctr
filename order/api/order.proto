@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package truckgo;
+
+option go_package = "github.com/alexandear/truckgo/grpcapi";
+
+service Order {
+  rpc Create(CreateRequest) returns (CreateResponse);
+  rpc UpdateStatus(UpdateStatusRequest) returns (UpdateStatusResponse);
+  rpc Accept(AcceptRequest) returns (AcceptResponse);
+  rpc Decline(DeclineRequest) returns (DeclineResponse);
+  rpc Cancel(CancelRequest) returns (CancelResponse);
+  rpc Archive(ArchiveRequest) returns (ArchiveResponse);
+  rpc GetOne(GetOneRequest) returns (GetOneResponse);
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc GetAll(GetAllRequest) returns (GetAllResponse);
+}
+
+message CreateRequest {
+  OrderEntity order = 1;
+}
+
+message CreateResponse {
+  int32  order_id = 1;
+}
+
+message UpdateStatusRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message UpdateStatusResponse {
+}
+
+message AcceptRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message AcceptResponse {
+}
+
+message DeclineRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message DeclineResponse {
+}
+
+message CancelRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message CancelResponse {
+}
+
+message ArchiveRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message ArchiveResponse {
+}
+
+message GetOneRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message GetOneResponse {
+  OrderEntity order = 1;
+}
+
+message GetHistoryRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message GetHistoryResponse {
+  repeated OrderEntity orders = 1;
+}
+
+message GetAllRequest {
+  int32 order_id = 1;
+  int32 user_id = 2;
+}
+
+message GetAllResponse {
+  repeated OrderEntity orders = 1;
+}
+
+message OrderEntity {
+  string Number = 1;
+  int32 Status = 2;
+  float Price = 3;
+}
