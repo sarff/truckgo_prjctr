@@ -79,11 +79,11 @@ message UpdateUserResponse {
 }
 
 message TypeRequest {
-    string Login = 1;
+    uint32 user_id = 1;
 }
 
 message TypeResponse {
-    string TypeUser = 1;
+    string type = 1;
     string message = 2;
 }
 
