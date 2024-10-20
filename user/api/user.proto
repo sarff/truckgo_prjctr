@@ -17,11 +17,10 @@ service UserService {
 message NewDriverRequest {
     string Login = 1;
     string FullName = 2;
-    string TypeUser = 3;
-    string Phone = 4;
-    string License = 5;
-    string CarModel = 6;
-    string CarNumber = 7;
+    string Phone = 3;
+    string License = 4;
+    string CarModel = 5;
+    string CarNumber = 6;
 }
 
 message NewDriverResponse {
@@ -31,8 +30,7 @@ message NewDriverResponse {
 message NewCustomerRequest {
     string Login = 1;
     string FullName = 2;
-    string TypeUser = 3;
-    string Phone = 4;
+    string Phone = 3;
 }
 
 message NewCustomerResponse {

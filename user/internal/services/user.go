@@ -69,7 +69,7 @@ func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (
 
 var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
 
-func (u *UserServiceServer) NewCustomer(ctx context.Context, req *userpb.NewCustomerRequest) (*userpb.NewCustomerResponse, error) {
+func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustomerRequest) (*userpb.NewCustomerResponse, error) {
 	matches := regexPhone.FindAllString(req.Phone, -1)
 	if len(matches) == 0 {
 		u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
@@ -90,18 +90,18 @@ func (u *UserServiceServer) NewCustomer(ctx context.Context, req *userpb.NewCust
 	}
 
 	return &userpb.NewCustomerResponse{
-		Message: fmt.Sprintf("User with type %s - created", req.TypeUser),
+		Message: fmt.Sprintf("User created"),
 	}, nil
 }
 
-func (u *UserServiceServer) GetCustomer(ctx context.Context, req *userpb.GetCustomerRequest) (*userpb.GetCustomerResponse, error) {
+func (u *UserServiceServer) GetCustomer(_ context.Context, req *userpb.GetCustomerRequest) (*userpb.GetCustomerResponse, error) {
 
 	return &userpb.GetCustomerResponse{
 		Customers: nil,
 	}, nil
 }
 
-func (u *UserServiceServer) NewDriver(ctx context.Context, req *userpb.NewDriverRequest) (*userpb.NewDriverResponse, error) {
+func (u *UserServiceServer) NewDriver(_ context.Context, req *userpb.NewDriverRequest) (*userpb.NewDriverResponse, error) {
 	matches := regexPhone.FindAllString(req.Phone, -1)
 	if len(matches) == 0 {
 		u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
@@ -129,23 +129,37 @@ func (u *UserServiceServer) NewDriver(ctx context.Context, req *userpb.NewDriver
 	}
 
 	return &userpb.NewDriverResponse{
-		Message: fmt.Sprintf("User with type %s - created", req.TypeUser),
+		Message: fmt.Sprintf("User created"),
 	}, nil
 }
 
-func (u *UserServiceServer) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
+func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
 	return &userpb.UpdateUserResponse{
 		Message: fmt.Sprintf("User with phone %s - updated", req.Login),
 	}, nil
 }
-func (u *UserServiceServer) GetType(ctx context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
-	//TODO add getting type by user_id
+func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
+	var user *models.User
+
+	var typeUser *models.TypeUser
+
+	if err := u.DB.First(&user, req.UserId).Error; err != nil {
+		u.Logger.Info("Record not Found", "GetType_User", err)
+		return nil, status.Error(codes.NotFound, "Record not found")
+	}
+
+	if err := u.DB.First(&typeUser, user.TypeUserID).Error; err != nil {
+		u.Logger.Info("Record not Found", "GetType_Type", err)
+		return nil, status.Error(codes.NotFound, "Record not found")
+	}
+
 	return &userpb.TypeResponse{
-		Type:    models.TypeCustomer,
-		Message: fmt.Sprintf("User with Login %s", req.UserId),
+		Type:    typeUser.Type,
+		Message: fmt.Sprintf("User with Login %v has type %s", req.UserId, typeUser.Type),
 	}, nil
 }
-func (u *UserServiceServer) GetUser(ctx context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {
+
+func (u *UserServiceServer) GetUser(_ context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {
 	return &userpb.UserResponse{
 		Message: fmt.Sprintf("success"),
 	}, nil
