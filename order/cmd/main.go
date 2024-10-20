@@ -10,7 +10,6 @@ import (
 
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 
 	"os"
@@ -48,9 +47,7 @@ func run(log *logging.Logger) error {
 }
 
 func initDB() (*gorm.DB, error) {
-	dbVarName := "POSTGRES_DB_" + serviceName
-	port := viper.GetString("POSTGRES_PORT_" + serviceName)
-	db, err := database.Initialize(dbVarName, port)
+	db, err := database.Initialize()
 	if err != nil {
 		return nil, err
 	}
@@ -63,19 +60,20 @@ func initDB() (*gorm.DB, error) {
 }
 
 func initGRPCServer(db *gorm.DB, log *logging.Logger) error {
-	port := viper.GetString("GRPC_PORT_" + serviceName)
-	lis, err := net.Listen("tcp", ":"+port)
+	lis, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT_"+serviceName))
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
+
 	grpcServer := grpc.NewServer()
 	orderRepository := repository.NewOrderRepository(db)
 	grpcapiOrder.RegisterOrderServer(grpcServer, &server{log: log, orderRepository: orderRepository})
 
-	log.Info("gRPC server is running on", "port", port)
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
 	}
+
+	log.Info("gRPC server is starting...")
 
 	return nil
 }

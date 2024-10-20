@@ -5,7 +5,7 @@ WORKDIR /app
 COPY ../go.mod ../go.sum ./
 RUN go mod download
 
-COPY order ./order-service
+COPY order ./order
 COPY ./shared ./shared
 COPY ./config.yaml ./config.yaml
 
@@ -13,8 +13,8 @@ RUN mkdir -p /app/logs
 
 WORKDIR /app/
 
-RUN go build -o /app/order-service/bin/server /app/order-service/cmd/*.go
+RUN go build -o /app/order/bin/server /app/order/cmd/*.go
 
 EXPOSE 50052
 
-CMD ["/app/order-service/bin/server"]
+CMD ["/app/order/bin/server"]
