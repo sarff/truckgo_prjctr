@@ -15,12 +15,13 @@ service UserService {
 }
 
 message NewDriverRequest {
-    string Login = 1;
-    string FullName = 2;
-    string Phone = 3;
-    string License = 4;
-    string CarModel = 5;
-    string CarNumber = 6;
+    uint32 Id = 1;
+    string Login = 2;
+    string FullName = 3;
+    string Phone = 4;
+    string License = 5;
+    string CarModel = 6;
+    string CarNumber = 7;
 }
 
 message NewDriverResponse {
@@ -28,9 +29,10 @@ message NewDriverResponse {
 }
 
 message NewCustomerRequest {
-    string Login = 1;
-    string FullName = 2;
-    string Phone = 3;
+    uint32 Id = 1;
+    string Login = 2;
+    string FullName = 3;
+    string Phone = 4;
 }
 
 message NewCustomerResponse {
@@ -63,12 +65,11 @@ message GetCustomerResponse {
 }
 
 message UpdateUserRequest {
-    string Login = 1;
+    uint32 Id = 1;
     string FullName = 2;
-    string License = 3;
-    string CarModel = 4;
-    string CarNumber = 5;
-    string Phone = 6;
+    string Phone = 3;
+    bool Status = 4;
+    float Rating = 5;
 
 }
 

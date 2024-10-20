@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"regexp"
 	"time"
 )
 
@@ -67,14 +66,14 @@ func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (
 	}, nil
 }
 
-var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
+//var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
 
 func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustomerRequest) (*userpb.NewCustomerResponse, error) {
-	matches := regexPhone.FindAllString(req.Phone, -1)
-	if len(matches) == 0 {
-		u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
-	}
+	//matches := regexPhone.FindAllString(req.Phone, -1)
+	//if len(matches) == 0 {
+	//	u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
+	//	return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+	//}
 
 	newUser := &models.User{
 		Login:      req.Login,
@@ -102,11 +101,11 @@ func (u *UserServiceServer) GetCustomer(_ context.Context, req *userpb.GetCustom
 }
 
 func (u *UserServiceServer) NewDriver(_ context.Context, req *userpb.NewDriverRequest) (*userpb.NewDriverResponse, error) {
-	matches := regexPhone.FindAllString(req.Phone, -1)
-	if len(matches) == 0 {
-		u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
-	}
+	//matches := regexPhone.FindAllString(req.Phone, -1)
+	//if len(matches) == 0 {
+	//	u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
+	//	return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+	//}
 
 	newUser := &models.User{
 		Login:      req.Login,
@@ -134,8 +133,25 @@ func (u *UserServiceServer) NewDriver(_ context.Context, req *userpb.NewDriverRe
 }
 
 func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUserRequest) (*userpb.UpdateUserResponse, error) {
+	var updateUser *models.User
+
+	if err := u.DB.First(&updateUser, req.Id).Error; err != nil {
+		u.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
+		return nil, fmt.Errorf("failed to update user: %v", err)
+	}
+
+	updateUser.FullName = req.FullName
+	updateUser.Status = req.Status
+	updateUser.Phone = req.Phone
+	updateUser.Rating = float64(req.Rating)
+
+	if err := u.DB.Save(&updateUser).Error; err != nil {
+		u.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
+		return nil, fmt.Errorf("failed to update user: %v", err)
+	}
+
 	return &userpb.UpdateUserResponse{
-		Message: fmt.Sprintf("User with phone %s - updated", req.Login),
+		Message: fmt.Sprintf("User with phone %s - updated", req.Id),
 	}, nil
 }
 func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
