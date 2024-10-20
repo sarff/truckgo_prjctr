@@ -26,6 +26,7 @@ services:
         - ./go.mod:/app/go.mod
         - ./go.sum:/app/go.sum
         - ./auth:/app/auth
+        - ./user:/app/user
         - ./shared:/app/shared
         - ./config.yaml:/app/config.yaml
         - ./.env:/app/.env
