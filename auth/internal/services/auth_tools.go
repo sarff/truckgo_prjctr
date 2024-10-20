@@ -2,26 +2,17 @@ package services
 
 import (
 	"fmt"
-	pb "github.com/alexandear/truckgo/auth/grpcapi"
-	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"os"
 	"time"
 )
 
-var jwtSecret = []byte(viper.GetString("JWT_SECRET"))
-
-type AuthServiceServer struct {
-	*gorm.DB
-	pb.UnimplementedAuthServiceServer
-	*logging.Logger
-	*models.Auth
-}
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 func hashPassword(password string) (string, error) {
 	if len(password) < 8 {
@@ -40,7 +31,7 @@ func checkPassword(hashedPassword, password string) error {
 
 func generateJWT(login string) (string, error) {
 	claims := jwt.MapClaims{
-		"login": login,
+		"Login": login,
 		"exp":   time.Now().Add(time.Hour * 72).Unix(),
 	}
 
@@ -55,10 +46,10 @@ func generateJWT(login string) (string, error) {
 }
 
 func (s *AuthServiceServer) checkUserByLogin(login string) error {
-	if err := s.DB.Where("login = ?", login).First(&s.Auth).Error; err != nil {
+	if err := s.DB.Where("Login = ?", login).First(&s.Auth).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			s.Logger.Error("user not found", logging.ErrUserNotFound, err)
-			return fmt.Errorf("user with login %s not found", login)
+			return fmt.Errorf("user with Login %s not found", login)
 		}
 		s.Logger.Error("user not found", logging.ErrDBQueryFailed, err)
 		return fmt.Errorf("failed to query user: %v", err)

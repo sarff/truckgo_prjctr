@@ -3,14 +3,14 @@ log_path: "./logs/logs.json"
 log_level: "debug"
 sqlite_path: "./storage/sqlite_db"
 db_type: "postgresql"
-JWT_SECRET: "TruckGoProjector"
+env_path: "./.env"
+#JWT_SECRET: "TruckGoProjector"
 
 #PG
 POSTGRES_USER: "truckgodbuser"
 POSTGRES_PASSWORD: "6085dc189f1444975fc8e832a2bb07c3d0816212"
 #pg_auth
-POSTGRES_DB_AUTH: "truckgodb_auth"
-POSTGRES_PORT_AUTH: "5432"
+#POSTGRES_DB_AUTH: "truckgodb_auth"
 #pg_user
 POSTGRES_DB_USER: "truckgodb_user"
 #pg_order
@@ -22,7 +22,7 @@ POSTGRES_DB_SHIPPING: "truckgodb_shipping"
 
 #GRPC
 #grpc_auth
-GRPC_PORT_AUTH: "50047"
+#GRPC_PORT_AUTH: "50047"
 #grpc_user
 GRPC_PORT_USER: "50048"
 #grpc_order

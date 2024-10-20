@@ -3,33 +3,41 @@ package services
 import (
 	"context"
 	"fmt"
-	pb "github.com/alexandear/truckgo/auth/grpcapi"
+	authpb "github.com/alexandear/truckgo/auth/grpcapi"
 	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 	"regexp"
 	"time"
 )
 
 var regexLogin = regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
 
+type AuthServiceServer struct {
+	*gorm.DB
+	authpb.UnimplementedAuthServiceServer
+	*logging.Logger
+	*models.Auth
+}
+
 // TODO: ctx
-func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
+func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRequest) (*authpb.RegisterResponse, error) {
 	matches := regexLogin.FindAllString(req.Login, -1)
 	if len(matches) == 0 {
-		s.Logger.Error("invalid login format", logging.ErrInvalidEmail, req.Login)
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid login format %s", req.Login))
+		s.Logger.Error("invalid Login format", logging.ErrInvalidEmail, req.Login)
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid Login format %s", req.Login))
 	}
-	if req.Typeuser != "driver" && req.Typeuser != "customer" {
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.Typeuser))
+	if req.TypeUser != "driver" && req.TypeUser != "customer" {
+		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.TypeUser))
 	}
 
 	err := s.checkUserByLogin(req.Login)
 	if err == nil {
-		s.Logger.Info("user with login %s already exists", logging.ErrUserAlreadyExists, req.Login)
-		return nil, fmt.Errorf("user with login %s already exists", req.Login)
+		s.Logger.Info("user with Login %s already exists", logging.ErrUserAlreadyExists, req.Login)
+		return nil, fmt.Errorf("user with Login %s already exists", req.Login)
 	}
 
 	hashedPassword, err := hashPassword(req.Password)
@@ -41,7 +49,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 	newUser := models.Auth{
 		Login:     req.Login,
 		Password:  hashedPassword,
-		TypeUser:  req.Typeuser,
+		TypeUser:  req.TypeUser,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -51,13 +59,13 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *pb.RegisterReques
 		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
 
-	return &pb.RegisterResponse{
-		Message: fmt.Sprintf("User registered successfully with login %s", req.Login),
+	return &authpb.RegisterResponse{
+		Message: fmt.Sprintf("User registered successfully with Login %s", req.Login),
 	}, nil
 }
 
 // TODO: ctx
-func (s *AuthServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
 
 	err := s.checkUserByLogin(req.Login)
 	if err != nil {
@@ -78,14 +86,14 @@ func (s *AuthServiceServer) Login(ctx context.Context, req *pb.LoginRequest) (*p
 		return nil, fmt.Errorf("failed to generate token: %v", err)
 	}
 
-	return &pb.LoginResponse{
+	return &authpb.LoginResponse{
 		Token:   token,
 		Message: "Login successful",
 	}, nil
 }
 
 // TODO: ctx
-func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
+func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
 	tokenStr := req.Token
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -101,33 +109,33 @@ func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *pb.ValidateT
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		login, exists := claims["login"].(string)
+		login, exists := claims["Login"].(string)
 		if !exists {
-			s.Logger.Error("login not found in token claims", logging.ErrInvalidToken, "login not found")
-			return &pb.ValidateTokenResponse{
+			s.Logger.Error("Login not found in token claims", logging.ErrInvalidToken, "Login not found")
+			return &authpb.ValidateTokenResponse{
 				IsValid: false,
 			}, nil
 		}
 		if login != req.Login {
-			s.Logger.Error("wrong login for this token", logging.ErrInvalidEmail, login)
-			return &pb.ValidateTokenResponse{
+			s.Logger.Error("wrong Login for this token", logging.ErrInvalidEmail, login)
+			return &authpb.ValidateTokenResponse{
 				IsValid: false,
 			}, nil
 		}
 
-		return &pb.ValidateTokenResponse{
+		return &authpb.ValidateTokenResponse{
 			IsValid: true,
 		}, nil
 	} else {
-		return &pb.ValidateTokenResponse{
+		return &authpb.ValidateTokenResponse{
 			IsValid: false,
 		}, nil
 	}
 }
 
 // TODO: ctx
-func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*pb.ChangePasswordResponse, error) {
-	tokenValidationRes, err := s.ValidateToken(ctx, &pb.ValidateTokenRequest{Token: req.Token})
+func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.ChangePasswordRequest) (*authpb.ChangePasswordResponse, error) {
+	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: req.Token})
 	if err != nil || !tokenValidationRes.IsValid {
 		return nil, fmt.Errorf("invalid or expired token")
 	}
@@ -153,7 +161,7 @@ func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *pb.ChangePa
 		return nil, fmt.Errorf("failed to update password: %v", err)
 	}
 
-	return &pb.ChangePasswordResponse{
+	return &authpb.ChangePasswordResponse{
 		Message: "Password is changed",
 	}, nil
 }

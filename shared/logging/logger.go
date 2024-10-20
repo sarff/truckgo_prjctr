@@ -10,7 +10,6 @@ import (
 	"sync"
 )
 
-// for global use
 var (
 	once sync.Once
 )
@@ -28,7 +27,6 @@ type Logger struct {
 	logFile *os.File
 }
 
-// InitLogger - for global use
 func InitLogger(prefix string) (*Logger, error) {
 	var initError error
 	var slogLogger *Logger
@@ -43,6 +41,13 @@ func InitLogger(prefix string) (*Logger, error) {
 
 func newLogger(prefix string) (*Logger, error) {
 	logFilePath := viper.GetString("log_path")
+
+	dir := filepath.Dir(logFilePath)
+	err := os.MkdirAll(dir, os.ModePerm) // os.ModePerm забезпечує повний доступ до директорій
+	if err != nil {
+		return nil, fmt.Errorf("cant create dir: %w", err)
+	}
+
 	logLevel := viper.GetString("log_level")
 	level := slog.LevelInfo
 	switch logLevel {
@@ -56,11 +61,10 @@ func newLogger(prefix string) (*Logger, error) {
 		level = slog.LevelInfo
 	}
 
-	dir := filepath.Dir(logFilePath)
 	fileName := filepath.Base(logFilePath)
 	extension := filepath.Ext(fileName)
 	nameWithoutExt := strings.TrimSuffix(fileName, extension)
-	newFileName := fmt.Sprintf("%s_%s%s", prefix, nameWithoutExt, extension) // "AUTH_logs.json"
+	newFileName := fmt.Sprintf("%s_%s%s", prefix, nameWithoutExt, extension)
 	newPath := filepath.Join(dir, newFileName)
 
 	logFile, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
