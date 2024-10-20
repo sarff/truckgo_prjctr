@@ -25,15 +25,17 @@ func (r *Order) Update(order models.Order, updates map[string]interface{}) error
 	return result.Error
 }
 
-// TODO пошук всіх з фільтрацією
-func (r *Order) FindAll(page int, limit int) ([]models.Order, int64, error) {
+func (r *Order) FindAll(page int, limit int, filters map[string]interface{}) ([]models.Order, int64, error) {
 	offset := (page - 1) * limit
 	var orders []models.Order
 	var total int64
 
-	err := r.db.
-		Model(&models.Order{}).
-		Count(&total).
+	query := r.db.Model(&models.Order{})
+	for column, value := range filters {
+		query = query.Where(column+" = ?", value)
+	}
+
+	err := query.Count(&total).
 		Limit(limit).
 		Offset(offset).
 		Find(&orders).Error

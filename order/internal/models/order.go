@@ -16,7 +16,6 @@ const (
 	StatusCancelled                // when order was incorrect - можна тільки customer з new
 )
 
-// TODO think about string status representation
 type Order struct {
 	ID         uint    `gorm:"primary_key;auto_increment"`
 	Number     string  `gorm:"unique;not null;index"`

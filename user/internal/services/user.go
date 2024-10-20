@@ -139,9 +139,10 @@ func (u *UserServiceServer) UpdateUser(ctx context.Context, req *userpb.UpdateUs
 	}, nil
 }
 func (u *UserServiceServer) GetType(ctx context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
+	//TODO add getting type by user_id
 	return &userpb.TypeResponse{
-		TypeUser: "TODO",
-		Message:  fmt.Sprintf("User with Login %s", req.Login),
+		Type:    models.TypeCustomer,
+		Message: fmt.Sprintf("User with Login %s", req.UserId),
 	}, nil
 }
 func (u *UserServiceServer) GetUser(ctx context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {

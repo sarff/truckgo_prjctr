@@ -73,20 +73,26 @@ message GetOneResponse {
 
 message GetHistoryByUserRequest {
   uint32 user_id = 1;
-  bool include_archived = 2;
+  bool is_archived = 2;
+  int32 page = 3;
+  int32 limit = 4;
 }
 
 message GetHistoryByUserResponse {
   repeated OrderEntity orders = 1;
+  int64 total = 2;
 }
 
 message GetAllByUserRequest {
   uint32 user_id = 1;
-  Status status_filter = 2;
+  Status status = 2;
+  int32 page = 3;
+  int32 limit = 4;
 }
 
 message GetAllByUserResponse {
   repeated OrderEntity orders = 1;
+  int64 total = 2;
 }
 
 message OrderEntity {

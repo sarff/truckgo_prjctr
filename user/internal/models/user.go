@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	TypeCustomer string = "customer" // when order was created
+	TypeDriver   string = "driver"   // when order in status new so it can be accepted
+)
+
 type User struct {
 	ID         uint      `gorm:"primary_key"`
 	Login      string    `gorm:"unique;not null"` // email

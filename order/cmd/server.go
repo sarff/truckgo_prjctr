@@ -73,7 +73,6 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	//TODO figure out what is correct response ??
 	return &pb.UpdateStatusResponse{}, nil
 }
 
@@ -101,7 +100,6 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	//TODO figure out what is correct response ??
 	return &pb.AcceptResponse{}, nil
 }
 
@@ -129,7 +127,6 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	//TODO figure out what is correct response ??
 	return &pb.DeclineResponse{}, nil
 }
 
@@ -156,7 +153,6 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	//TODO figure out what is correct response ??
 	return &pb.CancelResponse{}, nil
 }
 
@@ -182,7 +178,6 @@ func (s *server) Archive(_ context.Context, request *pb.ArchiveRequest) (*pb.Arc
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	//TODO figure out what is correct response ??
 	return &pb.ArchiveResponse{}, nil
 }
 
@@ -205,12 +200,85 @@ func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOn
 	return &pb.GetOneResponse{Order: &orderResponse}, nil
 }
 
-func (s *server) GetHistory(_ context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
-	//TODO validation of user type
-	return nil, nil
+func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
+	page := int(request.GetPage())
+	limit := int(request.GetLimit())
+	userID := uint(request.GetUserId())
+	userType, err := service.GetUserType(ctx, userID)
+	if err != nil {
+		s.log.Error("Cannot validate user type", "error", err)
+		return nil, err
+	}
+
+	var filters map[string]interface{}
+
+	switch userType {
+	case service.TypeCustomer:
+		filters["UserID"] = userID
+	case service.TypeDriver:
+		filters["DriverId"] = userID
+	}
+
+	filters["IsArchived"] = request.GetIsArchived()
+	filters["Status"] = models.StatusDone
+
+	orders, total, err := s.orderRepository.FindAll(page, limit, filters)
+	if err != nil {
+		s.log.Error("Cannot get orders from database", "error", err)
+		return nil, err
+	}
+
+	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
+	for _, order := range ordersResponse {
+		ordersResponse = append(ordersResponse, &pb.OrderEntity{
+			Number:   order.Number,
+			Status:   order.Status,
+			Price:    order.Price,
+			UserId:   order.UserId,
+			DriverId: order.DriverId,
+		})
+	}
+
+	return &pb.GetHistoryByUserResponse{Orders: ordersResponse, Total: total}, nil
 }
 
-func (s *server) GetAll(_ context.Context, request *pb.GetAllByUserRequest) (*pb.GetAllByUserResponse, error) {
-	//TODO validation of user type
-	return nil, nil
+func (s *server) GetAll(ctx context.Context, request *pb.GetAllByUserRequest) (*pb.GetAllByUserResponse, error) {
+	page := int(request.GetPage())
+	limit := int(request.GetLimit())
+	userID := uint(request.GetUserId())
+	userType, err := service.GetUserType(ctx, userID)
+	if err != nil {
+		s.log.Error("Cannot validate user type", "error", err)
+		return nil, err
+	}
+
+	var filters map[string]interface{}
+
+	switch userType {
+	case service.TypeCustomer:
+		filters["UserID"] = userID
+	case service.TypeDriver:
+		filters["DriverId"] = userID
+	}
+
+	filters["Status"] = models.Status(request.GetStatus())
+
+	orders, total, err := s.orderRepository.FindAll(page, limit, filters)
+	if err != nil {
+		s.log.Error("Cannot get orders from database", "error", err)
+		return nil, err
+	}
+
+	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
+	for _, order := range ordersResponse {
+		ordersResponse = append(ordersResponse, &pb.OrderEntity{
+			Number:   order.Number,
+			Status:   order.Status,
+			Price:    order.Price,
+			UserId:   order.UserId,
+			DriverId: order.DriverId,
+		})
+	}
+
+	return &pb.GetAllByUserResponse{Orders: ordersResponse, Total: total}, nil
 }
