@@ -19,8 +19,8 @@ func Migrate(db *gorm.DB) error {
 	// If there are no records, add 'customer' and 'driver'
 	if count == 0 {
 		users := []models.TypeUser{
-			{Type: "customer"},
-			{Type: "driver"},
+			{Type: "customer", ID: 1},
+			{Type: "driver", ID: 2},
 		}
 
 		if err := db.Create(&users).Error; err != nil {
