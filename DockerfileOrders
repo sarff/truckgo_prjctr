@@ -5,13 +5,15 @@ WORKDIR /app
 COPY ../go.mod ../go.sum ./
 RUN go mod download
 
-COPY order ./order
+COPY ./order ./order
 COPY ./shared ./shared
 COPY ./config.yaml ./config.yaml
+COPY ./shipping-service/grpc/grpcapi ./shipping-service/grpc/grpcapi
+COPY ./user/grpcapi ./user/grpcapi
 
 RUN mkdir -p /app/logs
 
-WORKDIR /app/
+WORKDIR /app
 
 RUN go build -o /app/order/bin/server /app/order/cmd/*.go
 
