@@ -50,16 +50,17 @@ func SeedDemoData(db *gorm.DB) error {
 	var drivers []models.Driver
 
 	// drivers
-	for i := 1; i <= 5; i++ {
+	var i uint32
+	for i = 1; i <= 5; i++ {
 		drivers = append(drivers, models.Driver{
-			ID:        uint32(i),
-			UserID:    uint32(i),
+			ID:        i,
+			UserID:    i,
 			License:   gofakeit.Numerify("########"),
 			CarModel:  gofakeit.RandomString([]string{"VW", "Audi", "BMW", "Volvo"}),
 			CarNumber: gofakeit.Numerify("АА###МЕ"),
 		})
 		users = append(users, models.User{
-			ID:         uint32(i),
+			ID:         i,
 			Login:      fmt.Sprintf("driver%d@example.com", i),
 			FullName:   gofakeit.LastName(),
 			TypeUserID: 2,
@@ -70,9 +71,9 @@ func SeedDemoData(db *gorm.DB) error {
 	}
 
 	// customers
-	for i := 6; i <= 10; i++ {
+	for i = 6; i <= 10; i++ {
 		users = append(users, models.User{
-			ID:         uint32(i),
+			ID:         i,
 			Login:      fmt.Sprintf("customer%d@example.com", i),
 			FullName:   gofakeit.LastName(),
 			TypeUserID: 1,

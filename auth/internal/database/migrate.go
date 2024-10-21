@@ -38,9 +38,10 @@ func SeedDemoData(db *gorm.DB) error {
 	var users []models.Auth
 
 	// drivers
-	for i := 1; i <= 5; i++ {
+	var i uint32
+	for i = 1; i <= 5; i++ {
 		users = append(users, models.Auth{
-			ID:       uint32(i),
+			ID:       i,
 			Login:    fmt.Sprintf("driver%d@example.com", i),
 			Password: pass,
 			TypeUser: "driver",
@@ -48,9 +49,9 @@ func SeedDemoData(db *gorm.DB) error {
 	}
 
 	// customers
-	for i := 6; i <= 10; i++ {
+	for i = 6; i <= 10; i++ {
 		users = append(users, models.Auth{
-			ID:       uint32(i),
+			ID:       i,
 			Login:    fmt.Sprintf("customer%d@example.com", i),
 			Password: pass,
 			TypeUser: "customer",
