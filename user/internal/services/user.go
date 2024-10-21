@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"regexp"
 	"time"
 )
 
@@ -66,14 +67,16 @@ func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (
 	}, nil
 }
 
-//var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
+var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
 
 func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustomerRequest) (*userpb.NewCustomerResponse, error) {
-	//matches := regexPhone.FindAllString(req.Phone, -1)
-	//if len(matches) == 0 {
-	//	u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
-	//	return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
-	//}
+	if req.Phone != "" {
+		matches := regexPhone.FindAllString(req.Phone, -1)
+		if len(matches) == 0 {
+			u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+		}
+	}
 
 	newUser := &models.User{
 		Login:      req.Login,
@@ -100,11 +103,13 @@ func (u *UserServiceServer) GetCustomer(_ context.Context, req *userpb.GetCustom
 }
 
 func (u *UserServiceServer) NewDriver(_ context.Context, req *userpb.NewDriverRequest) (*userpb.NewDriverResponse, error) {
-	//matches := regexPhone.FindAllString(req.Phone, -1)
-	//if len(matches) == 0 {
-	//	u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
-	//	return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
-	//}
+	if req.Phone != "" {
+		matches := regexPhone.FindAllString(req.Phone, -1)
+		if len(matches) == 0 {
+			u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+		}
+	}
 
 	newUser := &models.User{
 		Login:      req.Login,
@@ -141,7 +146,7 @@ func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUser
 	updateUser.FullName = req.FullName
 	updateUser.Status = req.Status
 	updateUser.Phone = req.Phone
-	updateUser.Rating = float64(req.Rating)
+	updateUser.Rating = req.Rating
 
 	if err := u.DB.Save(&updateUser).Error; err != nil {
 		u.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
@@ -174,7 +179,22 @@ func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) 
 }
 
 func (u *UserServiceServer) GetUser(_ context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {
+	var user *models.User
+
+	if err := u.DB.First(&user, req.Id).Error; err != nil {
+		if err := u.DB.First(&user, req.Login).Error; err != nil {
+			u.Logger.Info("Record not Found", "GetUser", err)
+			return nil, status.Error(codes.NotFound, "Record not found")
+		}
+	}
+
 	return &userpb.UserResponse{
-		Message: "success",
+		Id:         user.ID,
+		Login:      user.Login,
+		FullName:   user.FullName,
+		TypeUserID: user.TypeUserID,
+		Status:     user.Status,
+		Phone:      user.Phone,
+		Rating:     user.Rating,
 	}, nil
 }

@@ -10,9 +10,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 	"os"
 	"time"
@@ -20,9 +18,9 @@ import (
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
-func hashPassword(password string) (string, error) {
+func HashPassword(password string) (string, error) {
 	if len(password) < 8 {
-		return "", status.Error(codes.InvalidArgument, "password must be at least 8 characters")
+		return "", errors.New("password must be at least 8 characters")
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {

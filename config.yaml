@@ -4,8 +4,7 @@ log_level: "debug"
 sqlite_path: "./storage/sqlite_db"
 db_type: "postgresql"
 env_path: "./.env"
-#JWT_SECRET: "TruckGoProjector"
-
+is_demo: true
 #PG
 POSTGRES_USER: "truckgodbuser"
 POSTGRES_PASSWORD: "6085dc189f1444975fc8e832a2bb07c3d0816212"

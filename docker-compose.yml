@@ -3,6 +3,8 @@ services:
   db_auth:
       image: postgres:16
       container_name: pg_truckgo_auth
+      depends_on:
+        - db_user
       environment:
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
