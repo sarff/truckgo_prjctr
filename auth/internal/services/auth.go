@@ -39,7 +39,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 		return nil, status.Errorf(codes.AlreadyExists, "user with Login %s already exists", req.Login)
 	}
 
-	hashedPassword, err := hashPassword(req.Password)
+	hashedPassword, err := HashPassword(req.Password)
 	if err != nil {
 		s.Logger.Error("failed to hash password", logging.ErrPasswordHashingFailed, err)
 		return nil, status.Errorf(codes.Internal, "failed to hash password: %v", err)
@@ -149,7 +149,7 @@ func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.Chan
 		return nil, status.Error(codes.InvalidArgument, "old password is incorrect")
 	}
 
-	hashedNewPassword, err := hashPassword(req.NewPassword)
+	hashedNewPassword, err := HashPassword(req.NewPassword)
 	if err != nil {
 		s.Logger.Error("failed to hash new password", logging.ErrPasswordHashingFailed, err)
 		return nil, status.Errorf(codes.Internal, "failed to hash new password: %v", err)

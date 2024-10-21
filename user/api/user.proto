@@ -44,8 +44,8 @@ message DriverRequest {
 }
 
 message Driver {
-    int32 id = 1;
-    string position = 2;
+    uint32 Id = 1;
+    string Position = 2;
 }
 
 message DriverResponse {
@@ -57,7 +57,7 @@ message GetCustomerRequest {
 }
 
 message Customer {
-    int32 id = 1;
+    uint32 Id = 1;
 }
 
 message GetCustomerResponse {
@@ -87,9 +87,16 @@ message TypeResponse {
 }
 
 message UserRequest {
-
+    uint32 Id = 1;
+    string Login = 2;
 }
 
 message UserResponse {
-    string message = 1;
+   uint32 Id = 1;
+   string Login = 2;
+   string FullName = 3;
+   uint32 TypeUserID = 4;
+   bool Status = 5;
+   string Phone = 6;
+   float Rating = 7;
 }

@@ -3,6 +3,7 @@ module github.com/alexandear/truckgo
 go 1.23.0
 
 require (
+	github.com/brianvoe/gofakeit/v7 v7.0.4
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
