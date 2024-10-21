@@ -64,7 +64,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 		return nil, status.Errorf(codes.Internal, "failed to create user for User service: %v", err)
 	}
 	return &authpb.RegisterResponse{
-		Message: fmt.Sprintf("User registered successfully with Login %s", req.Login),
+		Message: fmt.Sprintf("User %s registered successfully ", req.Login),
 	}, nil
 }
 
