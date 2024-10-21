@@ -7,6 +7,7 @@ import (
 
 func TestInitialize(t *testing.T) {
 	t.Run("Fail to load .env file", func(t *testing.T) {
+		t.Parallel()
 		viper.Set("env_path", "nonexistent.env")
 		viper.Set("db_type", "sqlite")
 		_, err := Initialize()
@@ -16,6 +17,7 @@ func TestInitialize(t *testing.T) {
 	})
 
 	t.Run("Invalid database type", func(t *testing.T) {
+		t.Parallel()
 		viper.Set("env_path", ".env")
 		viper.Set("db_type", "invalid_db_type")
 		_, err := Initialize()

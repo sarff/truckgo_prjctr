@@ -17,7 +17,7 @@ type User struct {
 	UpdatedAt  time.Time `gorm:"autoCreateTime"`
 }
 
-// customer or driver
+// TypeUser customer or driver.
 type TypeUser struct {
 	ID   uint   `gorm:"primary_key"`
 	Type string `gorm:"not null"`

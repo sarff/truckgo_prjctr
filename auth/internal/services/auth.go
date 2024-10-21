@@ -69,8 +69,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 	}, nil
 }
 
-// TODO: ctx
-func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
+func (s *AuthServiceServer) Login(_ context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
 
 	err := s.checkUserByLogin(req.Login)
 	if err != nil {
@@ -97,10 +96,9 @@ func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest)
 	}, nil
 }
 
-// TODO: ctx
-func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
+func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
 	tokenStr := req.Token
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			s.Logger.Error("unexpected signing method", logging.ErrTokenValidationFailed, token.Header["alg"])
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -138,7 +136,6 @@ func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *authpb.Valid
 	}
 }
 
-// TODO: ctx
 func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.ChangePasswordRequest) (*authpb.ChangePasswordResponse, error) {
 	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: req.Token})
 	if err != nil || !tokenValidationRes.IsValid {
