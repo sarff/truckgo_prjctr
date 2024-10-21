@@ -74,7 +74,7 @@ func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustom
 		matches := regexPhone.FindAllString(req.Phone, -1)
 		if len(matches) == 0 {
 			u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
-			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid %s phone format", req.Phone))
 		}
 	}
 
@@ -107,7 +107,7 @@ func (u *UserServiceServer) NewDriver(_ context.Context, req *userpb.NewDriverRe
 		matches := regexPhone.FindAllString(req.Phone, -1)
 		if len(matches) == 0 {
 			u.Logger.Error("invalid phone format", logging.ErrInvalidPhone, req.Phone)
-			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid phone format %s", req.Phone))
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid %s phone format", req.Phone))
 		}
 	}
 
