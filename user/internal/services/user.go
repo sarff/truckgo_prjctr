@@ -19,9 +19,9 @@ type UserServiceServer struct {
 }
 
 func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (*userpb.DriverResponse, error) {
-	// TODO implement getting driver ids and positions
+	// TODO implement getting driver ids and positions.
 
-	// FIXME test currently just a test data
+	// FIXME test currently just a test data.
 	stubDrivers := []*userpb.Driver{
 		{
 			Id:       1,
@@ -89,12 +89,11 @@ func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustom
 	}
 
 	return &userpb.NewCustomerResponse{
-		Message: fmt.Sprintf("User created"),
+		Message: "user created",
 	}, nil
 }
 
 func (u *UserServiceServer) GetCustomer(_ context.Context, req *userpb.GetCustomerRequest) (*userpb.GetCustomerResponse, error) {
-
 	return &userpb.GetCustomerResponse{
 		Customers: nil,
 	}, nil
@@ -126,9 +125,8 @@ func (u *UserServiceServer) NewDriver(_ context.Context, req *userpb.NewDriverRe
 		u.Logger.Error("failed to create user", logging.ErrDBCreateFailed, err)
 		return nil, fmt.Errorf("failed to create user: %v", err)
 	}
-
 	return &userpb.NewDriverResponse{
-		Message: fmt.Sprintf("User created"),
+		Message: "User created",
 	}, nil
 }
 
@@ -151,7 +149,7 @@ func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUser
 	}
 
 	return &userpb.UpdateUserResponse{
-		Message: fmt.Sprintf("User with phone %s - updated", req.Id),
+		Message: fmt.Sprintf("User with phone %v - updated", req.Id),
 	}, nil
 }
 func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
@@ -177,6 +175,6 @@ func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) 
 
 func (u *UserServiceServer) GetUser(_ context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {
 	return &userpb.UserResponse{
-		Message: fmt.Sprintf("success"),
+		Message: "success",
 	}, nil
 }

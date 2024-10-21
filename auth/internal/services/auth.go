@@ -23,27 +23,26 @@ type AuthServiceServer struct {
 	*models.Auth
 }
 
-// TODO: ctx
 func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRequest) (*authpb.RegisterResponse, error) {
 	matches := regexLogin.FindAllString(req.Login, -1)
 	if len(matches) == 0 {
 		s.Logger.Error("invalid Login format", logging.ErrInvalidEmail, req.Login)
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid Login format %s", req.Login))
+		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
 	}
 	if req.TypeUser != "driver" && req.TypeUser != "customer" {
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.TypeUser))
+		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
 	}
 
 	err := s.checkUserByLogin(req.Login)
 	if err == nil {
 		s.Logger.Info("user with Login %s already exists", logging.ErrUserAlreadyExists, req.Login)
-		return nil, fmt.Errorf("user with Login %s already exists", req.Login)
+		return nil, status.Errorf(codes.AlreadyExists, "user with Login %s already exists", req.Login)
 	}
 
 	hashedPassword, err := hashPassword(req.Password)
 	if err != nil {
 		s.Logger.Error("failed to hash password", logging.ErrPasswordHashingFailed, err)
-		return nil, fmt.Errorf("failed to hash password: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to hash password: %v", err)
 	}
 
 	newUser := models.Auth{
@@ -56,22 +55,20 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 
 	if err = s.DB.Create(&newUser).Error; err != nil {
 		s.Logger.Error("failed to create user", logging.ErrDBCreateFailed, err)
-		return nil, fmt.Errorf("failed to create user: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
 
 	err = s.GrpcConnCreateUser(ctx, &newUser)
 	if err != nil {
 		s.Logger.Error("failed to create user for User service", logging.ErrDBCreateFailed, err)
-		return nil, fmt.Errorf("failed to create user for User service: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to create user for User service: %v", err)
 	}
 	return &authpb.RegisterResponse{
-		Message: fmt.Sprintf("User registered successfully with Login %s", req.Login),
+		Message: fmt.Sprintf("User %s registered successfully ", req.Login),
 	}, nil
 }
 
-// TODO: ctx
-func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-
+func (s *AuthServiceServer) Login(_ context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
 	err := s.checkUserByLogin(req.Login)
 	if err != nil {
 		return nil, err
@@ -80,7 +77,7 @@ func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest)
 	// checkPassword
 	if err := checkPassword(s.Auth.Password, req.Password); err != nil {
 		s.Logger.Error("invalid password", logging.ErrInvalidPassword, err)
-		return nil, fmt.Errorf("invalid password")
+		return nil, status.Error(codes.Internal, "invalid password")
 	}
 
 	// GEN JWT
@@ -88,7 +85,7 @@ func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest)
 	s.Logger.Info(s.Auth.Login)
 	if err != nil {
 		s.Logger.Error("failed to generate token", logging.ErrTokenGenerationFailed, err)
-		return nil, fmt.Errorf("failed to generate token: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to generate token: %v", err)
 	}
 
 	return &authpb.LoginResponse{
@@ -97,20 +94,19 @@ func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest)
 	}, nil
 }
 
-// TODO: ctx
-func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
+func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
 	tokenStr := req.Token
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			s.Logger.Error("unexpected signing method", logging.ErrTokenValidationFailed, token.Header["alg"])
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, status.Errorf(codes.Unknown, "unexpected signing method: %v", token.Header["alg"])
 		}
 		return jwtSecret, nil
 	})
 
 	if err != nil {
 		s.Logger.Error("unexpected signing method", logging.ErrInvalidToken, err)
-		return nil, fmt.Errorf("invalid token: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid token: %v", err)
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -138,11 +134,10 @@ func (s *AuthServiceServer) ValidateToken(ctx context.Context, req *authpb.Valid
 	}
 }
 
-// TODO: ctx
 func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.ChangePasswordRequest) (*authpb.ChangePasswordResponse, error) {
 	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: req.Token})
 	if err != nil || !tokenValidationRes.IsValid {
-		return nil, fmt.Errorf("invalid or expired token")
+		return nil, status.Error(codes.InvalidArgument, "invalid or expired token")
 	}
 
 	err = s.checkUserByLogin(req.Login)
@@ -151,19 +146,19 @@ func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.Chan
 	}
 	if err := checkPassword(s.Auth.Password, req.OldPassword); err != nil {
 		s.Logger.Error("invalid old password", logging.ErrInvalidPassword, err)
-		return nil, fmt.Errorf("old password is incorrect")
+		return nil, status.Error(codes.InvalidArgument, "old password is incorrect")
 	}
 
 	hashedNewPassword, err := hashPassword(req.NewPassword)
 	if err != nil {
 		s.Logger.Error("failed to hash new password", logging.ErrPasswordHashingFailed, err)
-		return nil, fmt.Errorf("failed to hash new password: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to hash new password: %v", err)
 	}
 
 	s.Auth.Password = hashedNewPassword
-	if err := s.DB.Save(&s.Auth).Error; err != nil {
+	if err = s.DB.Save(&s.Auth).Error; err != nil {
 		s.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
-		return nil, fmt.Errorf("failed to update password: %v", err)
+		return nil, status.Errorf(codes.Internal, "failed to update password: %v", err)
 	}
 
 	return &authpb.ChangePasswordResponse{

@@ -49,7 +49,7 @@ func newLogger(prefix string) (*Logger, error) {
 	}
 
 	logLevel := viper.GetString("log_level")
-	level := slog.LevelInfo
+	var level slog.Level
 	switch logLevel {
 	case "debug":
 		level = slog.LevelDebug

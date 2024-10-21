@@ -74,7 +74,7 @@ func (s *AuthServiceServer) GrpcConnCreateUser(ctx context.Context, auth *models
 	switch auth.TypeUser {
 	case "driver":
 		req := &userpb.NewDriverRequest{
-			Id:    uint32(auth.ID),
+			Id:    auth.ID,
 			Login: auth.Login,
 		}
 		_, err := userClient.NewDriver(ctx, req)
@@ -84,7 +84,7 @@ func (s *AuthServiceServer) GrpcConnCreateUser(ctx context.Context, auth *models
 		return nil
 	case "customer":
 		req := &userpb.NewCustomerRequest{
-			Id:    uint32(auth.ID),
+			Id:    auth.ID,
 			Login: auth.Login,
 		}
 		_, err := userClient.NewCustomer(ctx, req)
