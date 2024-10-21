@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	authpb "github.com/alexandear/truckgo/auth/grpcapi"
 	"github.com/alexandear/truckgo/auth/internal/models"
@@ -23,15 +24,14 @@ type AuthServiceServer struct {
 	*models.Auth
 }
 
-// TODO: ctx
 func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRequest) (*authpb.RegisterResponse, error) {
 	matches := regexLogin.FindAllString(req.Login, -1)
 	if len(matches) == 0 {
 		s.Logger.Error("invalid Login format", logging.ErrInvalidEmail, req.Login)
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid Login format %s", req.Login))
+		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
 	}
 	if req.TypeUser != "driver" && req.TypeUser != "customer" {
-		return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("invalid typeuser format %s", req.TypeUser))
+		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
 	}
 
 	err := s.checkUserByLogin(req.Login)
@@ -70,7 +70,6 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 }
 
 func (s *AuthServiceServer) Login(_ context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-
 	err := s.checkUserByLogin(req.Login)
 	if err != nil {
 		return nil, err
@@ -79,7 +78,7 @@ func (s *AuthServiceServer) Login(_ context.Context, req *authpb.LoginRequest) (
 	// checkPassword
 	if err := checkPassword(s.Auth.Password, req.Password); err != nil {
 		s.Logger.Error("invalid password", logging.ErrInvalidPassword, err)
-		return nil, fmt.Errorf("invalid password")
+		return nil, errors.New("invalid password")
 	}
 
 	// GEN JWT
@@ -139,7 +138,7 @@ func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.Validat
 func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.ChangePasswordRequest) (*authpb.ChangePasswordResponse, error) {
 	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: req.Token})
 	if err != nil || !tokenValidationRes.IsValid {
-		return nil, fmt.Errorf("invalid or expired token")
+		return nil, errors.New("invalid or expired token")
 	}
 
 	err = s.checkUserByLogin(req.Login)
@@ -148,7 +147,7 @@ func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.Chan
 	}
 	if err := checkPassword(s.Auth.Password, req.OldPassword); err != nil {
 		s.Logger.Error("invalid old password", logging.ErrInvalidPassword, err)
-		return nil, fmt.Errorf("old password is incorrect")
+		return nil, errors.New("old password is incorrect")
 	}
 
 	hashedNewPassword, err := hashPassword(req.NewPassword)

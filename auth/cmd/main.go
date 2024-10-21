@@ -34,7 +34,7 @@ func run(log *logging.Logger) error {
 	}
 
 	done := make(chan bool, 1)
-	//TODO: add ctx
+	//TODO: add ctx.
 	go func() {
 		if err = startGRPCServer(log, dbs); err != nil {
 			log.Error("gRPC server error:", "GRPC", err)
