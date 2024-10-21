@@ -35,7 +35,6 @@ linters:
     - noctx
     - nolintlint
     - nosprintfhostport
-    - paralleltest
     - perfsprint
     - reassign
     - revive
@@ -47,7 +46,6 @@ linters:
     - tenv
     - testifylint
     - thelper
-    - tparallel
     - unconvert
     - unused
     - usestdlibvars
