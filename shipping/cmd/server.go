@@ -44,7 +44,7 @@ func (s *server) GetCoordinatesByAddress(ctx context.Context,
 
 	return &grpcapiShipping.LocationResponse{
 		Longitude: coordinates[0],
-		Latitude: coordinates[1],
+		Latitude:  coordinates[1],
 	}, nil
 }
 
