@@ -42,14 +42,14 @@ func (s *server) Create(ctx context.Context, request *pb.CreateRequest) (*pb.Cre
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	ID, err := s.orderRepository.Create(price, userID)
+	id, err := s.orderRepository.Create(price, userID)
 	if err != nil {
 		s.log.Error("Cannot create order", "error", err)
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	s.log.Info("Created order", "id", ID)
-	return &pb.CreateResponse{OrderId: ID}, nil
+	s.log.Info("Created order", "id", id)
+	return &pb.CreateResponse{OrderId: id}, nil
 }
 
 // UpdateStatus can be done only by user with type driver. The right user id and type are validated on frontend.

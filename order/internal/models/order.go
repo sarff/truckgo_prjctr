@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type Status int
+type Status int32
 
 const (
 	StatusNew        Status = iota // when order was created
