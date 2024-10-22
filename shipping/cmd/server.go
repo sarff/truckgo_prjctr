@@ -34,7 +34,9 @@ type server struct {
 	grpcapiShipping.UnimplementedShippingServiceServer
 }
 
-func (s *server) GetCoordinatesByAddress(ctx context.Context, req *grpcapiShipping.LocationRequest) (*grpcapiShipping.LocationResponse, error) {
+func (s *server) GetCoordinatesByAddress(ctx context.Context,
+	req *grpcapiShipping.LocationRequest,
+) (*grpcapiShipping.LocationResponse, error) {
 	coordinates, err := geocode(ctx, req.Address)
 	if err != nil {
 		return nil, fmt.Errorf("error during getting coordinates: %v", err)
