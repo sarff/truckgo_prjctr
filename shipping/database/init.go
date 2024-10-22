@@ -2,15 +2,22 @@ package database
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
-func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
+func Initialize() (*gorm.DB, error) {
+	var err error
 	databaseType := viper.GetString("db_type")
+	err = godotenv.Load(viper.GetString("env_path"))
+	if err != nil {
+		return nil, fmt.Errorf("failed to load .env file: %v", err)
+	}
 
 	//  use sqlite for weak computers where there is no way to run docker with postgresql
 	if databaseType != "postgresql" && databaseType != "sqlite" {
@@ -18,7 +25,6 @@ func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
 	}
 
 	var db *gorm.DB
-	var err error
 
 	if databaseType == "sqlite" {
 		dbFile := viper.GetString("sqlite_path")
@@ -29,9 +35,9 @@ func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
 			return nil, fmt.Errorf("failed to open sqlite: %s", dbFile)
 		}
 	} else {
-		user := viper.GetString("POSTGRES_USER")
-		pass := viper.GetString("POSTGRES_PASSWORD")
-		dbname := viper.GetString(dbVarName)
+		user := os.Getenv("POSTGRES_USER")
+		pass := os.Getenv("POSTGRES_PASSWORD")
+		dbname := os.Getenv("POSTGRES_DB_SHIPPING")
 
 		// NOTE inside docker always 5432
 		dsn := fmt.Sprintf(

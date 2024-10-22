@@ -44,11 +44,11 @@ services:
       image: postgres:16
       container_name: pg_truckgo_user
       environment:
-        POSTGRES_USER: truckgodbuser
-        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_user
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB_USER}
       ports:
-        - "8881:5432"
+        - "${DB_USER_PORT}:5432"
       restart: always
       volumes:
         - postgres_user:/var/lib/postgresql/data
@@ -60,11 +60,11 @@ services:
       image: postgres:16
       container_name: pg_truckgo_order
       environment:
-        POSTGRES_USER: truckgodbuser
-        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_order
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB_ORDER}
       ports:
-        - "8882:5432"
+        - "${DB_ORDER_PORT}:5432"
       restart: always
       healthcheck:
         test: ["CMD-SHELL", "pg_isready"]
@@ -81,11 +81,11 @@ services:
       image: postgres:16
       container_name: pg_truckgo_payment
       environment:
-        POSTGRES_USER: truckgodbuser
-        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_payment
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB_PAYMENT}
       ports:
-        - "8883:5432"
+        - "${DB_PAYMENT_PORT}:5432"
       restart: always
       volumes:
         - postgres_payment:/var/lib/postgresql/data
@@ -97,11 +97,11 @@ services:
       image: postgres:16
       container_name: pg_truckgo_shippings
       environment:
-        POSTGRES_USER: truckgodbuser
-        POSTGRES_PASSWORD: 6085dc189f1444975fc8e832a2bb07c3d0816212
-        POSTGRES_DB: truckgodb_shipping
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        POSTGRES_DB: ${POSTGRES_DB_SHIPPING}
       ports:
-        - "8884:5432"
+        - "${DB_SHIPPING_PORT}:5432"
       restart: always
       healthcheck:
         test: ["CMD-SHELL", "pg_isready"]
@@ -125,6 +125,10 @@ services:
       ports:
         - "50051:50051"
       restart: always
+      volumes:
+        - ./config.yaml:/app/config.yaml
+        - ./.env:/app/.env
+        - ./logs:/app/logs
       networks:
         app-network:
             ipv4_address: 172.0.0.8
@@ -139,6 +143,10 @@ services:
           condition: service_healthy
       ports:
         - "50049:50049"
+      volumes:
+        - ./config.yaml:/app/config.yaml
+        - ./.env:/app/.env
+        - ./logs:/app/logs
       restart: always
       networks:
         app-network:
@@ -154,6 +162,10 @@ services:
           condition: service_healthy
       ports:
         - "50048:50048"
+      volumes:
+        - ./config.yaml:/app/config.yaml
+        - ./.env:/app/.env
+        - ./logs:/app/logs
       restart: always
       networks:
         app-network:

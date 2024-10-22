@@ -41,18 +41,19 @@ message Step {
     double duration = 3;
 }
 
-message Driver {
-    int32 id = 1;
-    string position = 2;
+message DriverData {
+    uint32 Id = 1;
+    double Latitude = 2;
+    double Longitude = 3;
 }
 
 message DriverRequest {
     string clientPosition = 1;
-    repeated Driver drivers = 2;
+    repeated DriverData drivers = 2;
 }
 
 message DriverResponse {
-    int32 id = 1;
+    uint32 id = 1;
     double distance = 2;
     double duration = 3;
     string message = 4;

@@ -9,12 +9,14 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 
-	"github.com/spf13/viper"
+	// "github.com/spf13/viper"
 )
 
 func getAPIKey() string {
-	return viper.GetString("MAP_API_KEY")
+	// return viper.GetString("MAP_API_KEY")
+	return os.Getenv("MAP_API_KEY")
 }
 
 type GeocodeResponse struct {

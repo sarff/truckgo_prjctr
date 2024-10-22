@@ -4,18 +4,26 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"github.com/spf13/viper"
+	"os"
+	"strconv"
 
 	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
 )
 
 func getStartPrice() float64 {
-	return viper.GetFloat64("START_PRICE")
+	price, err := strconv.ParseFloat(os.Getenv("START_PRICE"), 64)
+	if err != nil {
+		return 0.0
+	}
+	return price
 }
 
 func getKMPrice() float64 {
-	return viper.GetFloat64("KM_PRICE")
+	price, err := strconv.ParseFloat(os.Getenv("KM_PRICE"), 64)
+	if err != nil {
+		return 0.0
+	}
+	return price
 }
 
 func priceByFormula(distance float64) float64 {
@@ -104,7 +112,7 @@ func (s *server) FindTheNearestDriver(ctx context.Context,
 	}
 
 	type DriverDistance struct {
-		id       int32
+		id       uint32
 		distance float64
 		time     float64
 	}
