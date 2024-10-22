@@ -58,7 +58,7 @@ To run the **TruckGo** project using Docker Compose, follow these steps:
     - **Auth Database**: `localhost:8880`
     - **User Database**: `localhost:8881`
     - **Order-Service Database**: `localhost:8882`
-    - **Payment-Service Database**: `localhost:8883`
+    - **Payment Database**: `localhost:8883`
     - **Shipping-Service Database**: `localhost:8884`
     - **gRPC Auth**: `localhost:50047`
     - **gRPC Shipping-Service**: `localhost:50051`

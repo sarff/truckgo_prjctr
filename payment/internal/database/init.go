@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
+func Initialize() (*gorm.DB, error) {
 	databaseType := viper.GetString("db_type")
 
 	//  use sqlite for weak computers where there is no way to run docker with postgresql
@@ -31,11 +31,10 @@ func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
 	} else {
 		user := viper.GetString("POSTGRES_USER")
 		pass := viper.GetString("POSTGRES_PASSWORD")
-		dbname := viper.GetString(dbVarName)
+		dbname := "truckgodb_payment"
 
-		// NOTE inside docker always 5432
-		dsn := fmt.Sprintf("host=db_order user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv",
-			user, pass, dbname)
+		dsnTemplate := "host=db_payment user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv"
+		dsn := fmt.Sprintf(dsnTemplate, user, pass, dbname)
 
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
