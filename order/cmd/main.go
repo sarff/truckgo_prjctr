@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"os"
+
+	"google.golang.org/grpc"
+	"gorm.io/gorm"
+
 	grpcapiOrder "github.com/alexandear/truckgo/order/grpcapi"
 	"github.com/alexandear/truckgo/order/internal/database"
 	"github.com/alexandear/truckgo/order/internal/repository"
-	"gorm.io/gorm"
-	"net"
-
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
-	"google.golang.org/grpc"
-
-	"os"
 )
 
 const serviceName = "ORDER"

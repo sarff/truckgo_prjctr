@@ -2,12 +2,13 @@ package database
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"os"
 )
 
 func Initialize() (*gorm.DB, error) {

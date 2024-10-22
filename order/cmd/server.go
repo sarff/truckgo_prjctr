@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	pb "github.com/alexandear/truckgo/order/grpcapi"
 	"github.com/alexandear/truckgo/order/internal/models"
 	"github.com/alexandear/truckgo/order/internal/repository"
 	"github.com/alexandear/truckgo/order/internal/service"
 	"github.com/alexandear/truckgo/shared/logging"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type server struct {
@@ -203,14 +205,14 @@ func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOn
 func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
-	userID := uint(request.GetUserId())
+	userID := request.GetUserId()
 	userType, err := service.GetUserType(ctx, userID)
 	if err != nil {
 		s.log.Error("Cannot validate user type", "error", err)
 		return nil, err
 	}
 
-	var filters map[string]interface{}
+	var filters map[string]any
 
 	switch userType {
 	case service.TypeCustomer:
@@ -245,14 +247,14 @@ func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserReq
 func (s *server) GetAll(ctx context.Context, request *pb.GetAllByUserRequest) (*pb.GetAllByUserResponse, error) {
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
-	userID := uint(request.GetUserId())
+	userID := request.GetUserId()
 	userType, err := service.GetUserType(ctx, userID)
 	if err != nil {
 		s.log.Error("Cannot validate user type", "error", err)
 		return nil, err
 	}
 
-	var filters map[string]interface{}
+	var filters map[string]any
 
 	switch userType {
 	case service.TypeCustomer:

@@ -2,10 +2,11 @@ package service
 
 import (
 	"context"
-	shippingpb "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
-	userpb "github.com/alexandear/truckgo/user/grpcapi"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	shippingpb "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 const (
@@ -35,7 +36,7 @@ func GetOrderPrice(ctx context.Context, origin, destination string) (float64, er
 	return resp.GetPrice(), nil
 }
 
-func GetUserType(ctx context.Context, userID uint) (string, error) {
+func GetUserType(ctx context.Context, userID uint32) (string, error) {
 	conn, err := grpc.NewClient("user-server:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return "", err
