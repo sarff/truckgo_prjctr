@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"net"
+	"os"
+
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/alexandear/truckgo/shipping-service/database"
 	grpcapiShipping "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
-
-	"os"
 )
 
 const serviceName = "SHIPPING"
@@ -63,7 +63,7 @@ func initDB() error {
 func initGRPCServer(log *logging.Logger) error {
 	port := viper.GetString("GRPC_PORT_" + serviceName)
 
-	lis, err := net.Listen("tcp", ":" + port)
+	lis, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}

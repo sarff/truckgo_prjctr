@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	grpcapiShipping "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
 	"github.com/spf13/viper"
+
+	grpcapiShipping "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
 )
 
 func getStartPrice() float64 {
@@ -30,7 +31,6 @@ func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceR
 		Origin:      req.Origin,
 		Destination: req.Destination,
 	})
-
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 
 	var steps []*grpcapiShipping.Step
 
-	segment, err := calculateRouteByCoordinates(startPoint, endPoint)
+	segment, err := calculateRouteByCoordinates(ctx, startPoint, endPoint)
 	if err != nil {
 		return nil, fmt.Errorf("error during route calculation: %v", err)
 	}
@@ -96,7 +96,9 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 	}, nil
 }
 
-func (s *server) FindTheNearestDriver(ctx context.Context, req *grpcapiShipping.DriverRequest) (*grpcapiShipping.DriverResponse, error) {
+func (s *server) FindTheNearestDriver(ctx context.Context,
+	req *grpcapiShipping.DriverRequest,
+) (*grpcapiShipping.DriverResponse, error) {
 	if len(req.Drivers) == 0 {
 		return nil, errors.New("no drivers were provided")
 	}

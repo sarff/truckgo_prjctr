@@ -2,7 +2,9 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -50,7 +52,7 @@ func geocode(address string) ([]float64, error) {
 	}
 
 	if len(geoResp.Features) == 0 {
-		return nil, fmt.Errorf("coordinates are not found")
+		return nil, errors.New("coordinates are not found")
 	}
 
 	return geoResp.Features[0].Geometry.Coordinates, nil
@@ -80,7 +82,7 @@ type Step struct {
 	Instruction string  `json:"instruction"`
 }
 
-func calculateRouteByCoordinates(start, end []float64) (*Segment, error) {
+func calculateRouteByCoordinates(ctx context.Context, start, end []float64) (*Segment, error) {
 	url := "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
 
 	reqBody := RouteRequest{
@@ -95,7 +97,7 @@ func calculateRouteByCoordinates(start, end []float64) (*Segment, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +127,7 @@ func calculateRouteByCoordinates(start, end []float64) (*Segment, error) {
 	}
 
 	if len(routeResp.Features) == 0 || len(routeResp.Features[0].Properties.Segments) == 0 {
-		return nil, fmt.Errorf("segments are not found")
+		return nil, errors.New("segments are not found")
 	}
 
 	return &routeResp.Features[0].Properties.Segments[0], nil
