@@ -20,7 +20,7 @@ type server struct {
 	orderRepository *repository.Order
 }
 
-func (s *server) validateOrderID(orderID uint) (*models.Order, error) {
+func (s *server) validateOrderID(orderID uint32) (*models.Order, error) {
 	order, err := s.orderRepository.FindOneByID(orderID)
 	if err != nil {
 		s.log.Error("Invalid order", "error", err)
@@ -32,7 +32,7 @@ func (s *server) validateOrderID(orderID uint) (*models.Order, error) {
 
 // Create can be done only by user with type customer. The right user id and type are validated on frontend.
 func (s *server) Create(ctx context.Context, request *pb.CreateRequest) (*pb.CreateResponse, error) {
-	userID := uint(request.GetUserId())
+	userID := request.GetUserId()
 	origin := request.GetOrigin()
 	destination := request.GetDestination()
 
@@ -49,12 +49,12 @@ func (s *server) Create(ctx context.Context, request *pb.CreateRequest) (*pb.Cre
 	}
 
 	s.log.Info("Created order", "id", ID)
-	return &pb.CreateResponse{OrderId: uint32(ID)}, nil
+	return &pb.CreateResponse{OrderId: ID}, nil
 }
 
 // UpdateStatus can be done only by user with type driver. The right user id and type are validated on frontend.
 func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest) (*pb.UpdateStatusResponse, error) {
-	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	order, err := s.validateOrderID(request.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 		return nil, err
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"Status": models.Status(request.GetStatus()),
 	}
 	err = s.orderRepository.Update(*order, updates)
@@ -80,7 +80,7 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 
 // Accept can be done only by user with type driver. The right user id and type are validated on frontend.
 func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.AcceptResponse, error) {
-	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	order, err := s.validateOrderID(request.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
@@ -92,9 +92,9 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 		return nil, err
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"Status":   newStatus,
-		"DriverID": uint(request.GetUserId()),
+		"DriverID": request.GetUserId(),
 	}
 	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
@@ -107,7 +107,7 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 
 // Decline can be done by user with type driver or customer. The right user id and type are validated on frontend.
 func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.DeclineResponse, error) {
-	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	order, err := s.validateOrderID(request.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 		return nil, err
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"Status":   newStatus,
 		"DriverID": nil,
 	}
@@ -134,7 +134,7 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 
 // Cancel can be done by user with type customer. The right user id and type are validated on frontend.
 func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.CancelResponse, error) {
-	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	order, err := s.validateOrderID(request.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 		return nil, err
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"Status": newStatus,
 	}
 	err = s.orderRepository.Update(*order, updates)
@@ -160,7 +160,7 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 
 // Archive can be done by user with type customer. The right user id and type are validated on frontend.
 func (s *server) Archive(_ context.Context, request *pb.ArchiveRequest) (*pb.ArchiveResponse, error) {
-	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	order, err := s.validateOrderID(request.GetOrderId())
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (s *server) Archive(_ context.Context, request *pb.ArchiveRequest) (*pb.Arc
 		return nil, err
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"IsArchived": true,
 	}
 	err = s.orderRepository.Update(*order, updates)
@@ -185,7 +185,7 @@ func (s *server) Archive(_ context.Context, request *pb.ArchiveRequest) (*pb.Arc
 
 // GetOne can be done by user with type customer or driver. The right user id and type are validated on frontend.
 func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOneResponse, error) {
-	order, err := s.validateOrderID(uint(request.GetOrderId()))
+	order, err := s.validateOrderID(request.GetOrderId())
 	if err != nil {
 		s.log.Error("Invalid request", "error", err)
 		return nil, err
