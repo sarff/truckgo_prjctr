@@ -5,13 +5,14 @@ import (
 	"net"
 	"os"
 
+	"google.golang.org/grpc"
+	"gorm.io/gorm"
+
 	authpb "github.com/alexandear/truckgo/auth/grpcapi"
 	"github.com/alexandear/truckgo/auth/internal/database"
 	"github.com/alexandear/truckgo/auth/internal/services"
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
-	"google.golang.org/grpc"
-	"gorm.io/gorm"
 )
 
 const serviceName = "AUTH"

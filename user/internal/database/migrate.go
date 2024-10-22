@@ -3,10 +3,11 @@ package database
 import (
 	"fmt"
 
-	"github.com/alexandear/truckgo/user/internal/models"
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
+
+	"github.com/alexandear/truckgo/user/internal/models"
 )
 
 func Migrate(db *gorm.DB) error {

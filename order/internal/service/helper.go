@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 
-	shippingpb "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
-	userpb "github.com/alexandear/truckgo/user/grpcapi"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	shippingpb "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 const (

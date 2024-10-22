@@ -13,14 +13,15 @@ import (
 	"net"
 	"os"
 
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
+	"gorm.io/gorm"
+
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	userpb "github.com/alexandear/truckgo/user/grpcapi"
 	"github.com/alexandear/truckgo/user/internal/database"
 	"github.com/alexandear/truckgo/user/internal/services"
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
-	"gorm.io/gorm"
 )
 
 const serviceName = "USER"

@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	pb "github.com/alexandear/truckgo/order/grpcapi"
 	"github.com/alexandear/truckgo/order/internal/models"
 	"github.com/alexandear/truckgo/order/internal/repository"
 	"github.com/alexandear/truckgo/order/internal/service"
 	"github.com/alexandear/truckgo/shared/logging"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type server struct {

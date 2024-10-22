@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
 	"github.com/spf13/viper"
+
+	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
 )
 
 func getStartPrice() float64 {
