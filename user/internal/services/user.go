@@ -19,52 +19,9 @@ type UserServiceServer struct {
 	*logging.Logger
 }
 
-func (u *UserServiceServer) GetDrivers(context.Context, *userpb.DriverRequest) (*userpb.DriverResponse, error) {
-	// TODO implement getting driver ids and positions.
+func (u *UserServiceServer) GetDrivers(context.Context, *userpb.ListDriverRequest) (*userpb.ListDriverResponse, error) {
 
-	// FIXME test currently just a test data.
-	stubDrivers := []*userpb.Driver{
-		{
-			Id:       1,
-			Position: "метро Оболонь, Київ",
-		},
-		{
-			Id:       2,
-			Position: "метро Сирець, Київ",
-		},
-		{
-			Id:       3,
-			Position: "метро Нивки, Київ",
-		},
-		{
-			Id:       4,
-			Position: "Шпалерний ринок, Київ",
-		},
-		{
-			Id:       5,
-			Position: "метро Васильківська, Київ",
-		},
-		{
-			Id:       6,
-			Position: "метро Печерська, Київ",
-		},
-		{
-			Id:       7,
-			Position: "метро Позняки, Київ",
-		},
-		{
-			Id:       8,
-			Position: "метро Дарниця, Київ",
-		},
-		{
-			Id:       9,
-			Position: "Деснянський парк, Київ",
-		},
-	}
-
-	return &userpb.DriverResponse{
-		Drivers: stubDrivers,
-	}, nil
+	return &userpb.ListDriverResponse{}, nil
 }
 
 var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
@@ -96,8 +53,8 @@ func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustom
 	}, nil
 }
 
-func (u *UserServiceServer) GetCustomer(_ context.Context, req *userpb.GetCustomerRequest) (*userpb.GetCustomerResponse, error) {
-	return &userpb.GetCustomerResponse{
+func (u *UserServiceServer) ListCustomer(_ context.Context, req *userpb.ListCustomerRequest) (*userpb.ListCustomerResponse, error) {
+	return &userpb.ListCustomerResponse{
 		Customers: nil,
 	}, nil
 }
@@ -147,6 +104,8 @@ func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUser
 	updateUser.Status = req.Status
 	updateUser.Phone = req.Phone
 	updateUser.Rating = req.Rating
+	updateUser.Latitude = req.Latitude
+	updateUser.Longitude = req.Longitude
 
 	if err := u.DB.Save(&updateUser).Error; err != nil {
 		u.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
@@ -196,5 +155,7 @@ func (u *UserServiceServer) GetUser(_ context.Context, req *userpb.UserRequest) 
 		Status:     user.Status,
 		Phone:      user.Phone,
 		Rating:     user.Rating,
+		Latitude:   user.Latitude,
+		Longitude:  user.Longitude,
 	}, nil
 }

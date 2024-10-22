@@ -19,13 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_NewDriver_FullMethodName    = "/truckgo.UserService/NewDriver"
-	UserService_NewCustomer_FullMethodName  = "/truckgo.UserService/NewCustomer"
-	UserService_GetDrivers_FullMethodName   = "/truckgo.UserService/GetDrivers"
-	UserService_GetCustomers_FullMethodName = "/truckgo.UserService/GetCustomers"
-	UserService_UpdateUser_FullMethodName   = "/truckgo.UserService/UpdateUser"
-	UserService_GetType_FullMethodName      = "/truckgo.UserService/GetType"
-	UserService_GetUser_FullMethodName      = "/truckgo.UserService/GetUser"
+	UserService_NewDriver_FullMethodName     = "/truckgo.UserService/NewDriver"
+	UserService_NewCustomer_FullMethodName   = "/truckgo.UserService/NewCustomer"
+	UserService_ListDrivers_FullMethodName   = "/truckgo.UserService/ListDrivers"
+	UserService_ListCustomers_FullMethodName = "/truckgo.UserService/ListCustomers"
+	UserService_UpdateUser_FullMethodName    = "/truckgo.UserService/UpdateUser"
+	UserService_GetType_FullMethodName       = "/truckgo.UserService/GetType"
+	UserService_GetUser_FullMethodName       = "/truckgo.UserService/GetUser"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -34,8 +34,8 @@ const (
 type UserServiceClient interface {
 	NewDriver(ctx context.Context, in *NewDriverRequest, opts ...grpc.CallOption) (*NewDriverResponse, error)
 	NewCustomer(ctx context.Context, in *NewCustomerRequest, opts ...grpc.CallOption) (*NewCustomerResponse, error)
-	GetDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
-	GetCustomers(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error)
+	ListDrivers(ctx context.Context, in *ListDriverRequest, opts ...grpc.CallOption) (*ListDriverResponse, error)
+	ListCustomers(ctx context.Context, in *ListCustomerRequest, opts ...grpc.CallOption) (*ListCustomerResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	GetType(ctx context.Context, in *TypeRequest, opts ...grpc.CallOption) (*TypeResponse, error)
 	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
@@ -69,20 +69,20 @@ func (c *userServiceClient) NewCustomer(ctx context.Context, in *NewCustomerRequ
 	return out, nil
 }
 
-func (c *userServiceClient) GetDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
+func (c *userServiceClient) ListDrivers(ctx context.Context, in *ListDriverRequest, opts ...grpc.CallOption) (*ListDriverResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DriverResponse)
-	err := c.cc.Invoke(ctx, UserService_GetDrivers_FullMethodName, in, out, cOpts...)
+	out := new(ListDriverResponse)
+	err := c.cc.Invoke(ctx, UserService_ListDrivers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userServiceClient) GetCustomers(ctx context.Context, in *GetCustomerRequest, opts ...grpc.CallOption) (*GetCustomerResponse, error) {
+func (c *userServiceClient) ListCustomers(ctx context.Context, in *ListCustomerRequest, opts ...grpc.CallOption) (*ListCustomerResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetCustomerResponse)
-	err := c.cc.Invoke(ctx, UserService_GetCustomers_FullMethodName, in, out, cOpts...)
+	out := new(ListCustomerResponse)
+	err := c.cc.Invoke(ctx, UserService_ListCustomers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +125,8 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *UserRequest, opts .
 type UserServiceServer interface {
 	NewDriver(context.Context, *NewDriverRequest) (*NewDriverResponse, error)
 	NewCustomer(context.Context, *NewCustomerRequest) (*NewCustomerResponse, error)
-	GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
-	GetCustomers(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error)
+	ListDrivers(context.Context, *ListDriverRequest) (*ListDriverResponse, error)
+	ListCustomers(context.Context, *ListCustomerRequest) (*ListCustomerResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	GetType(context.Context, *TypeRequest) (*TypeResponse, error)
 	GetUser(context.Context, *UserRequest) (*UserResponse, error)
@@ -146,11 +146,11 @@ func (UnimplementedUserServiceServer) NewDriver(context.Context, *NewDriverReque
 func (UnimplementedUserServiceServer) NewCustomer(context.Context, *NewCustomerRequest) (*NewCustomerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method NewCustomer not implemented")
 }
-func (UnimplementedUserServiceServer) GetDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetDrivers not implemented")
+func (UnimplementedUserServiceServer) ListDrivers(context.Context, *ListDriverRequest) (*ListDriverResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDrivers not implemented")
 }
-func (UnimplementedUserServiceServer) GetCustomers(context.Context, *GetCustomerRequest) (*GetCustomerResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetCustomers not implemented")
+func (UnimplementedUserServiceServer) ListCustomers(context.Context, *ListCustomerRequest) (*ListCustomerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCustomers not implemented")
 }
 func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -218,38 +218,38 @@ func _UserService_NewCustomer_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetDrivers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DriverRequest)
+func _UserService_ListDrivers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDriverRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetDrivers(ctx, in)
+		return srv.(UserServiceServer).ListDrivers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetDrivers_FullMethodName,
+		FullMethod: UserService_ListDrivers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetDrivers(ctx, req.(*DriverRequest))
+		return srv.(UserServiceServer).ListDrivers(ctx, req.(*ListDriverRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetCustomers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetCustomerRequest)
+func _UserService_ListCustomers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCustomerRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetCustomers(ctx, in)
+		return srv.(UserServiceServer).ListCustomers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetCustomers_FullMethodName,
+		FullMethod: UserService_ListCustomers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetCustomers(ctx, req.(*GetCustomerRequest))
+		return srv.(UserServiceServer).ListCustomers(ctx, req.(*ListCustomerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -324,12 +324,12 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_NewCustomer_Handler,
 		},
 		{
-			MethodName: "GetDrivers",
-			Handler:    _UserService_GetDrivers_Handler,
+			MethodName: "ListDrivers",
+			Handler:    _UserService_ListDrivers_Handler,
 		},
 		{
-			MethodName: "GetCustomers",
-			Handler:    _UserService_GetCustomers_Handler,
+			MethodName: "ListCustomers",
+			Handler:    _UserService_ListCustomers_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
