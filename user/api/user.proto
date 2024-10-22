@@ -40,13 +40,13 @@ message NewCustomerResponse {
 }
 
 message ListDriverRequest {
-//    string message = 1;
+//     string message = 1;
 }
 
 message Driver {
     uint32 Id = 1;
-    float Latitude = 2;
-    float Longitude = 3;
+    double Latitude = 2;
+    double Longitude = 3;
 }
 
 message ListDriverResponse {
@@ -54,13 +54,13 @@ message ListDriverResponse {
 }
 
 message ListCustomerRequest {
-    //  nil
+//    string message = 1;
 }
 
 message Customer {
     uint32 Id = 1;
-    float Latitude = 2;
-    float Longitude = 3;
+    double Latitude = 2;
+    double Longitude = 3;
 }
 
 message ListCustomerResponse {

@@ -19,9 +19,40 @@ type UserServiceServer struct {
 	*logging.Logger
 }
 
-func (u *UserServiceServer) GetDrivers(context.Context, *userpb.ListDriverRequest) (*userpb.ListDriverResponse, error) {
+func convertUserToDriver(user *models.User) *userpb.Driver {
+	return &userpb.Driver{
+		Id:        user.ID,
+		Latitude:  user.Latitude,
+		Longitude: user.Longitude,
+	}
+}
 
-	return &userpb.ListDriverResponse{}, nil
+func convertUserToCustomer(user *models.User) *userpb.Customer {
+	return &userpb.Customer{
+		Id:        user.ID,
+		Latitude:  user.Latitude,
+		Longitude: user.Longitude,
+	}
+}
+
+func (u *UserServiceServer) ListDrivers(_ context.Context, req *userpb.ListDriverRequest) (*userpb.ListDriverResponse, error) {
+	var drivers []*userpb.Driver
+	var users []*models.User
+	err := u.DB.Select("id", "latitude", "longitude").
+		Where("status = ? AND type_user_id = ?", true, 2).
+		Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range users {
+		driver := convertUserToDriver(user)
+		drivers = append(drivers, driver)
+	}
+
+	return &userpb.ListDriverResponse{
+		Drivers: drivers,
+	}, nil
 }
 
 var regexPhone = regexp.MustCompile(`^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$`)
@@ -53,9 +84,23 @@ func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustom
 	}, nil
 }
 
-func (u *UserServiceServer) ListCustomer(_ context.Context, req *userpb.ListCustomerRequest) (*userpb.ListCustomerResponse, error) {
+func (u *UserServiceServer) ListCustomers(_ context.Context, req *userpb.ListCustomerRequest) (*userpb.ListCustomerResponse, error) {
+	var customers []*userpb.Customer
+	var users []*models.User
+	err := u.DB.Select("id", "latitude", "longitude").
+		Where("status = ? AND type_user_id = ?", true, 1).
+		Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, user := range users {
+		customer := convertUserToCustomer(user)
+		customers = append(customers, customer)
+	}
+
 	return &userpb.ListCustomerResponse{
-		Customers: nil,
+		Customers: customers,
 	}, nil
 }
 

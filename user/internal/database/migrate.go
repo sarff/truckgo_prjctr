@@ -51,9 +51,9 @@ func SeedDemoData(db *gorm.DB) error {
 
 	// drivers
 	var i uint32
-	lat, _ := gofakeit.LatitudeInRange(50.150001, 50.700001)
-	long, _ := gofakeit.LongitudeInRange(30.100001, 30.990001)
 	for i = 1; i <= 5; i++ {
+		lat, _ := gofakeit.LatitudeInRange(50.150001, 50.700001)
+		long, _ := gofakeit.LongitudeInRange(30.100001, 30.990001)
 		drivers = append(drivers, models.Driver{
 			ID:        i,
 			UserID:    i,
@@ -76,6 +76,8 @@ func SeedDemoData(db *gorm.DB) error {
 
 	// customers
 	for i = 6; i <= 10; i++ {
+		lat, _ := gofakeit.LatitudeInRange(50.150001, 50.700001)
+		long, _ := gofakeit.LongitudeInRange(30.100001, 30.990001)
 		users = append(users, models.User{
 			ID:         i,
 			Login:      fmt.Sprintf("customer%d@example.com", i),
@@ -84,6 +86,8 @@ func SeedDemoData(db *gorm.DB) error {
 			Status:     true,
 			Phone:      gofakeit.Phone(),
 			Rating:     gofakeit.Float32Range(0, 100),
+			Latitude:   lat,
+			Longitude:  long,
 		})
 	}
 
