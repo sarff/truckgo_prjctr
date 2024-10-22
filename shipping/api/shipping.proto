@@ -5,10 +5,20 @@ package truckgo;
 option go_package = "github.com/alexandear/truckgo/grpcapi";
 
 service ShippingService {
+    rpc GetCoordinatesByAddress(LocationRequest) returns (LocationResponse);
     rpc CalculatePrice(PriceRequest) returns (PriceResponse);
     rpc CalculateRoute(RouteRequest) returns (RouteResponse);
     rpc FindTheNearestDriver(DriverRequest) returns (DriverResponse);
     rpc TestFunc(TestRequest) returns (TestResponse);
+}
+
+message LocationRequest {
+    string address = 1;
+}
+
+message LocationResponse {
+    double Latitude = 1;
+    double Longitude = 2;
 }
 
 message PriceRequest {

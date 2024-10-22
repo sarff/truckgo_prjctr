@@ -19,16 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ShippingService_CalculatePrice_FullMethodName       = "/truckgo.ShippingService/CalculatePrice"
-	ShippingService_CalculateRoute_FullMethodName       = "/truckgo.ShippingService/CalculateRoute"
-	ShippingService_FindTheNearestDriver_FullMethodName = "/truckgo.ShippingService/FindTheNearestDriver"
-	ShippingService_TestFunc_FullMethodName             = "/truckgo.ShippingService/TestFunc"
+	ShippingService_GetCoordinatesByAddress_FullMethodName = "/truckgo.ShippingService/GetCoordinatesByAddress"
+	ShippingService_CalculatePrice_FullMethodName          = "/truckgo.ShippingService/CalculatePrice"
+	ShippingService_CalculateRoute_FullMethodName          = "/truckgo.ShippingService/CalculateRoute"
+	ShippingService_FindTheNearestDriver_FullMethodName    = "/truckgo.ShippingService/FindTheNearestDriver"
+	ShippingService_TestFunc_FullMethodName                = "/truckgo.ShippingService/TestFunc"
 )
 
 // ShippingServiceClient is the client API for ShippingService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShippingServiceClient interface {
+	GetCoordinatesByAddress(ctx context.Context, in *LocationRequest, opts ...grpc.CallOption) (*LocationResponse, error)
 	CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
 	CalculateRoute(ctx context.Context, in *RouteRequest, opts ...grpc.CallOption) (*RouteResponse, error)
 	FindTheNearestDriver(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
@@ -41,6 +43,16 @@ type shippingServiceClient struct {
 
 func NewShippingServiceClient(cc grpc.ClientConnInterface) ShippingServiceClient {
 	return &shippingServiceClient{cc}
+}
+
+func (c *shippingServiceClient) GetCoordinatesByAddress(ctx context.Context, in *LocationRequest, opts ...grpc.CallOption) (*LocationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LocationResponse)
+	err := c.cc.Invoke(ctx, ShippingService_GetCoordinatesByAddress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *shippingServiceClient) CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error) {
@@ -87,6 +99,7 @@ func (c *shippingServiceClient) TestFunc(ctx context.Context, in *TestRequest, o
 // All implementations must embed UnimplementedShippingServiceServer
 // for forward compatibility.
 type ShippingServiceServer interface {
+	GetCoordinatesByAddress(context.Context, *LocationRequest) (*LocationResponse, error)
 	CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error)
 	CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error)
 	FindTheNearestDriver(context.Context, *DriverRequest) (*DriverResponse, error)
@@ -101,6 +114,9 @@ type ShippingServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedShippingServiceServer struct{}
 
+func (UnimplementedShippingServiceServer) GetCoordinatesByAddress(context.Context, *LocationRequest) (*LocationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCoordinatesByAddress not implemented")
+}
 func (UnimplementedShippingServiceServer) CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalculatePrice not implemented")
 }
@@ -132,6 +148,24 @@ func RegisterShippingServiceServer(s grpc.ServiceRegistrar, srv ShippingServiceS
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&ShippingService_ServiceDesc, srv)
+}
+
+func _ShippingService_GetCoordinatesByAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LocationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShippingServiceServer).GetCoordinatesByAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShippingService_GetCoordinatesByAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShippingServiceServer).GetCoordinatesByAddress(ctx, req.(*LocationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _ShippingService_CalculatePrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -213,6 +247,10 @@ var ShippingService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "truckgo.ShippingService",
 	HandlerType: (*ShippingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetCoordinatesByAddress",
+			Handler:    _ShippingService_GetCoordinatesByAddress_Handler,
+		},
 		{
 			MethodName: "CalculatePrice",
 			Handler:    _ShippingService_CalculatePrice_Handler,

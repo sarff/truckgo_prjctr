@@ -34,6 +34,18 @@ type server struct {
 	grpcapiShipping.UnimplementedShippingServiceServer
 }
 
+func (s *server) GetCoordinatesByAddress(ctx context.Context, req *grpcapiShipping.LocationRequest) (*grpcapiShipping.LocationResponse, error) {
+	coordinates, err := geocode(ctx, req.Address)
+	if err != nil {
+		return nil, fmt.Errorf("error during getting coordinates: %v", err)
+	}
+
+	return &grpcapiShipping.LocationResponse{
+		Longitude: coordinates[0],
+		Latitude: coordinates[1],
+	}, nil
+}
+
 func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceRequest) (*grpcapiShipping.PriceResponse, error) {
 	res, err := s.CalculateRoute(ctx, &grpcapiShipping.RouteRequest{
 		Origin:      req.Origin,
