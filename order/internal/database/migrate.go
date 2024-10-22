@@ -1,9 +1,8 @@
 package database
 
 import (
-	"gorm.io/gorm"
-
 	"github.com/alexandear/truckgo/order/internal/models"
+	"gorm.io/gorm"
 )
 
 func Migrate(db *gorm.DB) error {

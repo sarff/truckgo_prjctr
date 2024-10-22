@@ -5,13 +5,12 @@ import (
 	"net"
 	"os"
 
-	"github.com/spf13/viper"
-	"google.golang.org/grpc"
-
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/alexandear/truckgo/shipping/database"
 	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
+	"github.com/spf13/viper"
+	"google.golang.org/grpc"
 )
 
 const serviceName = "SHIPPING"

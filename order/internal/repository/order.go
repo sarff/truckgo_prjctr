@@ -1,9 +1,8 @@
 package repository
 
 import (
-	"gorm.io/gorm"
-
 	"github.com/alexandear/truckgo/order/internal/models"
+	"gorm.io/gorm"
 )
 
 type Order struct {
