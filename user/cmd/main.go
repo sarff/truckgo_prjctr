@@ -10,7 +10,7 @@ package main
 
 import (
 	"fmt"
-	grpcapiUser "github.com/alexandear/truckgo/user/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 	"github.com/alexandear/truckgo/user/internal/database"
 	"github.com/alexandear/truckgo/user/internal/services"
 	"gorm.io/gorm"
@@ -78,7 +78,7 @@ func initGRPCServer(log *logging.Logger, db *gorm.DB) error {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	grpcapiUser.RegisterUserServiceServer(grpcServer, &services.UserServiceServer{
+	userpb.RegisterUserServiceServer(grpcServer, &services.UserServiceServer{
 		DB:     db,
 		Logger: log,
 	})

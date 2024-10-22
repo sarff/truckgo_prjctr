@@ -7,8 +7,8 @@ option go_package = "/grpcapi;user";
 service UserService {
     rpc NewDriver(NewDriverRequest) returns (NewDriverResponse);
     rpc NewCustomer(NewCustomerRequest) returns (NewCustomerResponse);
-    rpc GetDrivers(DriverRequest) returns (DriverResponse);
-    rpc GetCustomers(GetCustomerRequest) returns (GetCustomerResponse);
+    rpc ListDrivers(ListDriverRequest) returns (ListDriverResponse);
+    rpc ListCustomers(ListCustomerRequest) returns (ListCustomerResponse);
     rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse);
     rpc GetType(TypeRequest) returns (TypeResponse);
     rpc GetUser(UserRequest) returns (UserResponse);
@@ -39,28 +39,31 @@ message NewCustomerResponse {
     string message = 1;
 }
 
-message DriverRequest {
-    string message = 1;
+message ListDriverRequest {
+//     string message = 1;
 }
 
 message Driver {
     uint32 Id = 1;
-    string Position = 2;
+    double Latitude = 2;
+    double Longitude = 3;
 }
 
-message DriverResponse {
+message ListDriverResponse {
     repeated Driver drivers = 1;
 }
 
-message GetCustomerRequest {
-    //  nil
+message ListCustomerRequest {
+//    string message = 1;
 }
 
 message Customer {
     uint32 Id = 1;
+    double Latitude = 2;
+    double Longitude = 3;
 }
 
-message GetCustomerResponse {
+message ListCustomerResponse {
     repeated Customer customers = 1;
 }
 
@@ -70,6 +73,8 @@ message UpdateUserRequest {
     string Phone = 3;
     bool Status = 4;
     float Rating = 5;
+    double Latitude = 6;
+    double Longitude = 7;
 
 }
 
@@ -99,4 +104,6 @@ message UserResponse {
    bool Status = 5;
    string Phone = 6;
    float Rating = 7;
+   double Latitude = 8;
+   double Longitude = 9;
 }

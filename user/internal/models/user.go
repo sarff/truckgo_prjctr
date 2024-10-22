@@ -15,6 +15,8 @@ type User struct {
 	Rating     float32   `gorm:"default:0"`
 	CreatedAt  time.Time `gorm:"autoCreateTime"`
 	UpdatedAt  time.Time `gorm:"autoCreateTime"`
+	Latitude   float64   `gorm:"default:0"`
+	Longitude  float64   `gorm:"default:0"`
 }
 
 // TypeUser customer or driver.
@@ -30,5 +32,4 @@ type Driver struct {
 	License   string `gorm:"not null"`
 	CarModel  string `gorm:"not null"`
 	CarNumber string `gorm:"not null"`
-	//	Position  string  `gorm:"not null"`
 }
