@@ -14,7 +14,7 @@ func NewOrderRepository(db *gorm.DB) *Order {
 	return &Order{db: db}
 }
 
-func (r *Order) Create(price float64, userID uint) (uint, error) {
+func (r *Order) Create(price float64, userID uint32) (uint32, error) {
 	order := models.NewOrder(price, userID)
 	result := r.db.Create(&order)
 
@@ -44,7 +44,7 @@ func (r *Order) FindAll(page int, limit int, filters map[string]any) ([]models.O
 	return orders, total, err
 }
 
-func (r *Order) FindOneByID(id uint) (models.Order, error) {
+func (r *Order) FindOneByID(id uint32) (models.Order, error) {
 	var order models.Order
 
 	err := r.db.

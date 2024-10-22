@@ -55,12 +55,12 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 	fmt.Printf("Origin: %v\n", req.Origin)
 	fmt.Printf("Destination: %v\n", req.Destination)
 
-	startPoint, err := geocode(req.Origin)
+	startPoint, err := geocode(ctx, req.Origin)
 	if err != nil {
 		return nil, fmt.Errorf("error during getting origin coordinates: %v", err)
 	}
 
-	endPoint, err := geocode(req.Destination)
+	endPoint, err := geocode(ctx, req.Destination)
 	if err != nil {
 		return nil, fmt.Errorf("error during getting destination coordinates: %v", err)
 	}

@@ -25,16 +25,22 @@ type GeocodeResponse struct {
 	} `json:"features"`
 }
 
-func geocode(address string) ([]float64, error) {
+func geocode(ctx context.Context, address string) ([]float64, error) {
 	escapedAddress := url.QueryEscape(address)
 	url := fmt.Sprintf("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s", getAPIKey(), escapedAddress)
 
 	fmt.Printf("URL = %v\n", url)
 
-	resp, err := http.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {

@@ -4,16 +4,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/alexandear/truckgo/auth/internal/models"
-	"github.com/alexandear/truckgo/shared/logging"
-	userpb "github.com/alexandear/truckgo/user/grpcapi"
+	"os"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
-	"os"
-	"time"
+
+	"github.com/alexandear/truckgo/auth/internal/models"
+	"github.com/alexandear/truckgo/shared/logging"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))

@@ -2,17 +2,16 @@ package logging
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/spf13/viper"
 )
 
-var (
-	once sync.Once
-)
+var once sync.Once
 
 type LoggerInterface interface {
 	Info(msg string, args ...any)
@@ -67,7 +66,7 @@ func newLogger(prefix string) (*Logger, error) {
 	newFileName := fmt.Sprintf("%s_%s%s", prefix, nameWithoutExt, extension)
 	newPath := filepath.Join(dir, newFileName)
 
-	logFile, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	logFile, err := os.OpenFile(newPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o666)
 	if err != nil {
 		return nil, err
 	}

@@ -3,15 +3,17 @@ package services
 import (
 	"context"
 	"fmt"
-	authpb "github.com/alexandear/truckgo/auth/grpcapi"
-	"github.com/alexandear/truckgo/auth/internal/models"
-	"github.com/alexandear/truckgo/shared/logging"
+	"regexp"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"regexp"
-	"time"
+
+	authpb "github.com/alexandear/truckgo/auth/grpcapi"
+	"github.com/alexandear/truckgo/auth/internal/models"
+	"github.com/alexandear/truckgo/shared/logging"
 )
 
 var regexLogin = regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
@@ -94,7 +96,9 @@ func (s *AuthServiceServer) Login(_ context.Context, req *authpb.LoginRequest) (
 	}, nil
 }
 
-func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.ValidateTokenRequest) (*authpb.ValidateTokenResponse, error) {
+func (s *AuthServiceServer) ValidateToken(_ context.Context,
+	req *authpb.ValidateTokenRequest,
+) (*authpb.ValidateTokenResponse, error) {
 	tokenStr := req.Token
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -103,7 +107,6 @@ func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.Validat
 		}
 		return jwtSecret, nil
 	})
-
 	if err != nil {
 		s.Logger.Error("unexpected signing method", logging.ErrInvalidToken, err)
 		return nil, status.Errorf(codes.InvalidArgument, "invalid token: %v", err)
@@ -134,7 +137,9 @@ func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.Validat
 	}
 }
 
-func (s *AuthServiceServer) ChangePassword(ctx context.Context, req *authpb.ChangePasswordRequest) (*authpb.ChangePasswordResponse, error) {
+func (s *AuthServiceServer) ChangePassword(ctx context.Context,
+	req *authpb.ChangePasswordRequest,
+) (*authpb.ChangePasswordResponse, error) {
 	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: req.Token})
 	if err != nil || !tokenValidationRes.IsValid {
 		return nil, status.Error(codes.InvalidArgument, "invalid or expired token")

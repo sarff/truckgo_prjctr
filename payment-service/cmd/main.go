@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/spf13/viper"
+
 	"github.com/alexandear/truckgo/payment-service/database"
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
-	"github.com/spf13/viper"
-
-	"os"
 )
 
 const serviceName = "PAYMENT"

@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type Status int
+type Status int32
 
 const (
 	StatusNew        Status = iota // when order was created
@@ -17,16 +17,16 @@ const (
 )
 
 type Order struct {
-	ID         uint    `gorm:"primary_key;auto_increment"`
+	ID         uint32  `gorm:"primary_key;auto_increment"`
 	Number     string  `gorm:"unique;not null;index"`
 	Status     Status  `gorm:"not null;default:0"`
 	Price      float64 `gorm:"not null;default:0"`
-	UserID     uint    `gorm:"not null"`
-	DriverID   uint    `gorm:"null"`
+	UserID     uint32  `gorm:"not null"`
+	DriverID   uint32  `gorm:"null"`
 	IsArchived bool    `gorm:"default:false"`
 }
 
-func NewOrder(price float64, userID uint) *Order {
+func NewOrder(price float64, userID uint32) *Order {
 	return &Order{
 		Number: generateOrderNumber(),
 		Status: StatusNew,

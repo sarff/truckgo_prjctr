@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
@@ -32,9 +33,9 @@ func Initialize(dbVarName, dbPort string) (*gorm.DB, error) {
 		pass := viper.GetString("POSTGRES_PASSWORD")
 		dbname := viper.GetString(dbVarName)
 
-		// dsn := fmt.Sprintf("host=db_order user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Europe/Kyiv", user, pass, dbname, dbPort)
 		// NOTE inside docker always 5432
-		dsn := fmt.Sprintf("host=db_order user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv", user, pass, dbname)
+		dsn := fmt.Sprintf("host=db_order user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv",
+			user, pass, dbname)
 
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {

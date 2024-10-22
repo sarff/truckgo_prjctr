@@ -3,14 +3,16 @@ package services
 import (
 	"context"
 	"fmt"
-	"github.com/alexandear/truckgo/shared/logging"
-	userpb "github.com/alexandear/truckgo/user/grpcapi"
-	"github.com/alexandear/truckgo/user/internal/models"
+	"regexp"
+	"time"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"regexp"
-	"time"
+
+	"github.com/alexandear/truckgo/shared/logging"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
+	"github.com/alexandear/truckgo/user/internal/models"
 )
 
 type UserServiceServer struct {
@@ -84,7 +86,9 @@ func (u *UserServiceServer) NewCustomer(_ context.Context, req *userpb.NewCustom
 	}, nil
 }
 
-func (u *UserServiceServer) ListCustomers(_ context.Context, req *userpb.ListCustomerRequest) (*userpb.ListCustomerResponse, error) {
+func (u *UserServiceServer) ListCustomers(_ context.Context,
+	req *userpb.ListCustomerRequest,
+) (*userpb.ListCustomerResponse, error) {
 	var customers []*userpb.Customer
 	var users []*models.User
 	err := u.DB.Select("id", "latitude", "longitude").
@@ -161,6 +165,7 @@ func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUser
 		Message: fmt.Sprintf("User with phone %v - updated", req.Id),
 	}, nil
 }
+
 func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
 	var user *models.User
 
