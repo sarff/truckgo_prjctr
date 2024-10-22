@@ -3,14 +3,15 @@ package services
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"time"
+
 	"github.com/alexandear/truckgo/shared/logging"
 	userpb "github.com/alexandear/truckgo/user/grpcapi"
 	"github.com/alexandear/truckgo/user/internal/models"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"regexp"
-	"time"
 )
 
 type UserServiceServer struct {
@@ -161,6 +162,7 @@ func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUser
 		Message: fmt.Sprintf("User with phone %v - updated", req.Id),
 	}, nil
 }
+
 func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) (*userpb.TypeResponse, error) {
 	var user *models.User
 

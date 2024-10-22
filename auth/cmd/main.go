@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net"
+	"os"
+
 	authpb "github.com/alexandear/truckgo/auth/grpcapi"
 	"github.com/alexandear/truckgo/auth/internal/database"
 	"github.com/alexandear/truckgo/auth/internal/services"
@@ -11,8 +14,6 @@ import (
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	"google.golang.org/grpc"
-	"net"
-	"os"
 )
 
 const serviceName = "AUTH"
@@ -34,7 +35,7 @@ func run(log *logging.Logger) error {
 	}
 
 	done := make(chan bool, 1)
-	//TODO: add ctx.
+	// TODO: add ctx.
 	go func() {
 		if err = startGRPCServer(log, dbs); err != nil {
 			log.Error("gRPC server error:", "GRPC", err)

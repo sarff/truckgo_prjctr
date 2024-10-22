@@ -3,6 +3,9 @@ package services
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"time"
+
 	authpb "github.com/alexandear/truckgo/auth/grpcapi"
 	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/shared/logging"
@@ -10,8 +13,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
-	"regexp"
-	"time"
 )
 
 var regexLogin = regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
@@ -103,7 +104,6 @@ func (s *AuthServiceServer) ValidateToken(_ context.Context, req *authpb.Validat
 		}
 		return jwtSecret, nil
 	})
-
 	if err != nil {
 		s.Logger.Error("unexpected signing method", logging.ErrInvalidToken, err)
 		return nil, status.Errorf(codes.InvalidArgument, "invalid token: %v", err)

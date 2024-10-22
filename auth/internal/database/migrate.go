@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+
 	"github.com/alexandear/truckgo/auth/internal/models"
 	"github.com/alexandear/truckgo/auth/internal/services"
 	"github.com/spf13/viper"
