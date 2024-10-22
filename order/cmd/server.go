@@ -195,8 +195,8 @@ func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOn
 		Number:   order.Number,
 		Status:   pb.Status(order.Status),
 		Price:    order.Price,
-		UserId:   uint32(order.UserID),
-		DriverId: uint32(order.DriverID),
+		UserId:   order.UserID,
+		DriverId: order.DriverID,
 	}
 
 	return &pb.GetOneResponse{Order: &orderResponse}, nil
@@ -212,7 +212,7 @@ func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserReq
 		return nil, err
 	}
 
-	var filters map[string]any
+	filters := make(map[string]any)
 
 	switch userType {
 	case service.TypeCustomer:
@@ -254,7 +254,7 @@ func (s *server) GetAll(ctx context.Context, request *pb.GetAllByUserRequest) (*
 		return nil, err
 	}
 
-	var filters map[string]any
+	filters := make(map[string]any)
 
 	switch userType {
 	case service.TypeCustomer:

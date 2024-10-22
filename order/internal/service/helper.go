@@ -46,7 +46,7 @@ func GetUserType(ctx context.Context, userID uint32) (string, error) {
 	userClient := userpb.NewUserServiceClient(conn)
 
 	req := &userpb.TypeRequest{
-		UserId: uint32(userID),
+		UserId: userID,
 	}
 
 	resp, err := userClient.GetType(ctx, req)
