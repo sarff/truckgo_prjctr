@@ -21,7 +21,7 @@ truckgo/
 ├── auth/
 ├── order-service/
 ├── payment-service/
-├── shipping-service/
+├── shipping/
 ├── rest/
 ├── user/
 ├── shared/

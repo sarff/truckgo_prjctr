@@ -10,8 +10,8 @@ import (
 
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
-	"github.com/alexandear/truckgo/shipping-service/database"
-	grpcapiShipping "github.com/alexandear/truckgo/shipping-service/grpc/grpcapi"
+	"github.com/alexandear/truckgo/shipping/database"
+	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
 )
 
 const serviceName = "SHIPPING"
