@@ -1,9 +1,10 @@
 package logging
 
 import (
-	"github.com/spf13/viper"
 	"os"
 	"testing"
+
+	"github.com/spf13/viper"
 )
 
 func TestInitLogger(t *testing.T) {

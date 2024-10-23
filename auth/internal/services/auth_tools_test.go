@@ -1,8 +1,9 @@
 package services
 
 import (
-	"golang.org/x/crypto/bcrypt"
 	"testing"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestHashPassword(t *testing.T) {
