@@ -207,7 +207,8 @@ func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOn
 	return &pb.GetOneResponse{Order: &orderResponse}, nil
 }
 
-func (s *server) GetHistoryByUser(ctx context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
+func (s *server) GetHistoryByUser(
+	ctx context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
 	userID := request.GetUserId()

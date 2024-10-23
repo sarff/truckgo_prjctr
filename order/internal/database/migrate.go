@@ -3,10 +3,10 @@ package database
 import (
 	"strconv"
 
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
 	"github.com/alexandear/truckgo/order/internal/models"
-	"github.com/spf13/viper"
 )
 
 func Migrate(db *gorm.DB) error {

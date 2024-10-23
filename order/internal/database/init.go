@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-
-	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 )
 
 func Initialize() (*gorm.DB, error) {
