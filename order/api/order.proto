@@ -85,7 +85,9 @@ message GetHistoryByUserResponse {
 
 message GetAllByUserRequest {
   uint32 user_id = 1;
-  Status status = 2;
+  oneof optional_status {
+    Status status = 2;
+  }
   int32 page = 3;
   int32 limit = 4;
 }

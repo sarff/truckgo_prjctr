@@ -232,13 +232,13 @@ func (s *server) GetHistoryByUser(ctx context.Context, request *pb.GetHistoryByU
 	}
 
 	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
-	for _, order := range ordersResponse {
+	for _, order := range orders {
 		ordersResponse = append(ordersResponse, &pb.OrderEntity{
 			Number:     order.Number,
-			Status:     order.Status,
+			Status:     pb.Status(order.Status),
 			Price:      order.Price,
-			UserId:     order.UserId,
-			DriverId:   order.DriverId,
+			UserId:     order.UserID,
+			DriverId:   order.DriverID,
 			IsArchived: order.IsArchived,
 		})
 	}
@@ -265,7 +265,9 @@ func (s *server) GetAllByUser(ctx context.Context, request *pb.GetAllByUserReque
 		filters["driver_id"] = userID
 	}
 
-	filters["status"] = models.Status(request.GetStatus())
+	if statusWrapper, ok := request.GetOptionalStatus().(*pb.GetAllByUserRequest_Status); ok {
+		filters["status"] = models.Status(statusWrapper.Status)
+	}
 
 	orders, total, err := s.orderRepository.FindAll(page, limit, filters)
 	if err != nil {
@@ -274,13 +276,13 @@ func (s *server) GetAllByUser(ctx context.Context, request *pb.GetAllByUserReque
 	}
 
 	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
-	for _, order := range ordersResponse {
+	for _, order := range orders {
 		ordersResponse = append(ordersResponse, &pb.OrderEntity{
 			Number:     order.Number,
-			Status:     order.Status,
+			Status:     pb.Status(order.Status),
 			Price:      order.Price,
-			UserId:     order.UserId,
-			DriverId:   order.DriverId,
+			UserId:     order.UserID,
+			DriverId:   order.DriverID,
 			IsArchived: order.IsArchived,
 		})
 	}
