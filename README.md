@@ -8,9 +8,9 @@
 ### Core Microservices:
 
 - **auth**: A microservice for user authorization and authentication using JWT tokens.
-- **Order-Service**: Responsible for managing orders.
-- **Payment-Service**: Handles payment processing and transactions.
-- **Shipping-Service**: Manages shipping operations.
+- **order**: Responsible for managing orders.
+- **payment**: Handles payment processing and transactions.
+- **shipping**: Manages shipping operations.
 - **rest**: For interaction between front-end and back-end.
 - **user**: Manages user profiles, roles, and statuses.
 - **Shared**: Modules for logging, configurations, and general logic used by all services.
@@ -19,8 +19,8 @@
 ```
 truckgo/
 ├── auth/
-├── order-service/
-├── payment-service/
+├── order/
+├── payment/
 ├── shipping/
 ├── rest/
 ├── user/

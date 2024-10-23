@@ -64,8 +64,9 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 	}
 
 	newStatus := models.Status(request.GetStatus())
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -90,8 +91,9 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 	}
 
 	newStatus := models.StatusAccepted
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -117,8 +119,9 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 	}
 
 	newStatus := models.StatusNew
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -144,8 +147,9 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 	}
 
 	newStatus := models.StatusCancelled
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
