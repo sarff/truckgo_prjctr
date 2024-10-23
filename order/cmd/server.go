@@ -11,6 +11,8 @@ import (
 	"github.com/alexandear/truckgo/order/internal/repository"
 	"github.com/alexandear/truckgo/order/internal/service"
 	"github.com/alexandear/truckgo/shared/logging"
+	shippingpb "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 type server struct {
@@ -18,6 +20,8 @@ type server struct {
 
 	log             *logging.Logger
 	orderRepository *repository.Order
+	shippingClient  shippingpb.ShippingServiceClient
+	userClient      userpb.UserServiceClient
 }
 
 func (s *server) validateOrderID(orderID uint32) (*models.Order, error) {
@@ -36,7 +40,7 @@ func (s *server) Create(ctx context.Context, request *pb.CreateRequest) (*pb.Cre
 	origin := request.GetOrigin()
 	destination := request.GetDestination()
 
-	price, err := service.GetOrderPrice(ctx, origin, destination)
+	price, err := service.GetOrderPrice(ctx, s.shippingClient, origin, destination)
 	if err != nil {
 		s.log.Error("Cannot calculate price", "error", err)
 		return nil, status.Error(codes.Internal, err.Error())
@@ -207,7 +211,7 @@ func (s *server) GetHistoryByUser(ctx context.Context, request *pb.GetHistoryByU
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
 	userID := request.GetUserId()
-	userType, err := service.GetUserType(ctx, userID)
+	userType, err := service.GetUserType(ctx, s.userClient, userID)
 	if err != nil {
 		s.log.Error("Cannot validate user type", "error", err)
 		return nil, err
@@ -250,7 +254,7 @@ func (s *server) GetAllByUser(ctx context.Context, request *pb.GetAllByUserReque
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
 	userID := request.GetUserId()
-	userType, err := service.GetUserType(ctx, userID)
+	userType, err := service.GetUserType(ctx, s.userClient, userID)
 	if err != nil {
 		s.log.Error("Cannot validate user type", "error", err)
 		return nil, err

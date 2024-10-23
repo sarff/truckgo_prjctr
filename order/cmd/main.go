@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 
 	grpcapiOrder "github.com/alexandear/truckgo/order/grpcapi"
@@ -13,6 +14,8 @@ import (
 	"github.com/alexandear/truckgo/order/internal/repository"
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
+	shippingpb "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 const serviceName = "ORDER"
@@ -66,8 +69,26 @@ func initGRPCServer(db *gorm.DB, log *logging.Logger) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	orderRepository := repository.NewOrderRepository(db)
-	grpcapiOrder.RegisterOrderServer(grpcServer, &server{log: log, orderRepository: orderRepository})
+
+	shippingClient, err := initShippingClient()
+	if err != nil {
+		return fmt.Errorf("failed to get shipping client: %v", err)
+	}
+
+	userClient, err := initUserClient()
+	if err != nil {
+		return fmt.Errorf("failed to get user client: %v", err)
+	}
+
+	grpcapiOrder.RegisterOrderServer(
+		grpcServer,
+		&server{
+			log:             log,
+			orderRepository: repository.NewOrderRepository(db),
+			shippingClient:  shippingClient,
+			userClient:      userClient,
+		},
+	)
 
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
@@ -76,4 +97,22 @@ func initGRPCServer(db *gorm.DB, log *logging.Logger) error {
 	log.Info("gRPC server is starting...")
 
 	return nil
+}
+
+func initShippingClient() (shippingpb.ShippingServiceClient, error) {
+	conn, err := grpc.NewClient("172.0.0.8:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+
+	return shippingpb.NewShippingServiceClient(conn), nil
+}
+
+func initUserClient() (userpb.UserServiceClient, error) {
+	conn, err := grpc.NewClient("172.0.0.10:50048", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+
+	return userpb.NewUserServiceClient(conn), nil
 }
