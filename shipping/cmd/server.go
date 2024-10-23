@@ -41,7 +41,7 @@ type server struct {
 func (s *server) GetCoordinatesByAddress(ctx context.Context,
 	req *grpcapiShipping.LocationRequest,
 ) (*grpcapiShipping.LocationResponse, error) {
-	coordinates, err := geocode(ctx, req.Address)
+	coordinates, err := geocode(ctx, getAPIKey(), req.Address)
 	if err != nil {
 		return nil, fmt.Errorf("error during getting coordinates: %v", err)
 	}
@@ -60,7 +60,7 @@ func (s *server) CalculateRouteByCoordinates(ctx context.Context,
 	startPoint := []float64{req.OriginLongitude, req.OriginLatitude}
 	endPoint := []float64{req.DestinationLongitude, req.DestinationLatitude}
 
-	segment, err := calculateRouteByCoordinatesImpl(ctx, startPoint, endPoint)
+	segment, err := calculateRouteByCoordinatesImpl(ctx, getAPIKey(), startPoint, endPoint)
 	if err != nil {
 		return nil, fmt.Errorf("error during route calculation: %v", err)
 	}
@@ -214,11 +214,5 @@ func (s *server) FindTheNearestDrivers(ctx context.Context,
 	return &grpcapiShipping.DriverResponse{
 		DriverIds: nearestDrivers,
 		Message:   "Drivers were found!",
-	}, nil
-}
-
-func (s *server) TestFunc(ctx context.Context, req *grpcapiShipping.TestRequest) (*grpcapiShipping.TestResponse, error) {
-	return &grpcapiShipping.TestResponse{
-		Message: "Some testing!",
 	}, nil
 }

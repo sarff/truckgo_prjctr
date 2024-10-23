@@ -24,7 +24,6 @@ const (
 	ShippingService_CalculateRoute_FullMethodName              = "/truckgo.ShippingService/CalculateRoute"
 	ShippingService_CalculatePrice_FullMethodName              = "/truckgo.ShippingService/CalculatePrice"
 	ShippingService_FindTheNearestDrivers_FullMethodName       = "/truckgo.ShippingService/FindTheNearestDrivers"
-	ShippingService_TestFunc_FullMethodName                    = "/truckgo.ShippingService/TestFunc"
 )
 
 // ShippingServiceClient is the client API for ShippingService service.
@@ -36,7 +35,6 @@ type ShippingServiceClient interface {
 	CalculateRoute(ctx context.Context, in *RouteRequest, opts ...grpc.CallOption) (*RouteResponse, error)
 	CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
 	FindTheNearestDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
-	TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
 }
 
 type shippingServiceClient struct {
@@ -97,16 +95,6 @@ func (c *shippingServiceClient) FindTheNearestDrivers(ctx context.Context, in *D
 	return out, nil
 }
 
-func (c *shippingServiceClient) TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TestResponse)
-	err := c.cc.Invoke(ctx, ShippingService_TestFunc_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ShippingServiceServer is the server API for ShippingService service.
 // All implementations must embed UnimplementedShippingServiceServer
 // for forward compatibility.
@@ -116,7 +104,6 @@ type ShippingServiceServer interface {
 	CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error)
 	CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error)
 	FindTheNearestDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
-	TestFunc(context.Context, *TestRequest) (*TestResponse, error)
 	mustEmbedUnimplementedShippingServiceServer()
 }
 
@@ -141,9 +128,6 @@ func (UnimplementedShippingServiceServer) CalculatePrice(context.Context, *Price
 }
 func (UnimplementedShippingServiceServer) FindTheNearestDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindTheNearestDrivers not implemented")
-}
-func (UnimplementedShippingServiceServer) TestFunc(context.Context, *TestRequest) (*TestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TestFunc not implemented")
 }
 func (UnimplementedShippingServiceServer) mustEmbedUnimplementedShippingServiceServer() {}
 func (UnimplementedShippingServiceServer) testEmbeddedByValue()                         {}
@@ -256,24 +240,6 @@ func _ShippingService_FindTheNearestDrivers_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ShippingService_TestFunc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TestRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ShippingServiceServer).TestFunc(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ShippingService_TestFunc_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShippingServiceServer).TestFunc(ctx, req.(*TestRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ShippingService_ServiceDesc is the grpc.ServiceDesc for ShippingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -300,10 +266,6 @@ var ShippingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindTheNearestDrivers",
 			Handler:    _ShippingService_FindTheNearestDrivers_Handler,
-		},
-		{
-			MethodName: "TestFunc",
-			Handler:    _ShippingService_TestFunc_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -10,7 +10,6 @@ service ShippingService {
     rpc CalculateRoute(RouteRequest) returns (RouteResponse);
     rpc CalculatePrice(PriceRequest) returns (PriceResponse);
     rpc FindTheNearestDrivers(DriverRequest) returns (DriverResponse);
-    rpc TestFunc(TestRequest) returns (TestResponse);
 }
 
 message LocationRequest {
@@ -68,12 +67,4 @@ message DriverRequest {
 message DriverResponse {
     repeated uint32 driver_ids = 1;
     string message = 2;
-}
-
-message TestRequest {
-    string message = 1;
-}
-
-message TestResponse {
-    string message = 1;
 }
