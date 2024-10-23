@@ -67,7 +67,7 @@ linters-settings:
       - fieldalignment
       - shadow
   lll:
-    line-length: 130
+    line-length: 180
   misspell:
     locale: US
     extra-words:
