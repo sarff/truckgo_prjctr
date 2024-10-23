@@ -67,7 +67,7 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 	}
 
 	updates := map[string]any{
-		"Status": models.Status(request.GetStatus()),
+		"Status": newStatus,
 	}
 	err = s.orderRepository.Update(*order, updates)
 	if err != nil {
@@ -192,17 +192,18 @@ func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOn
 	}
 
 	orderResponse := pb.OrderEntity{
-		Number:   order.Number,
-		Status:   pb.Status(order.Status),
-		Price:    order.Price,
-		UserId:   order.UserID,
-		DriverId: order.DriverID,
+		Number:     order.Number,
+		Status:     pb.Status(order.Status),
+		Price:      order.Price,
+		UserId:     order.UserID,
+		DriverId:   order.DriverID,
+		IsArchived: order.IsArchived,
 	}
 
 	return &pb.GetOneResponse{Order: &orderResponse}, nil
 }
 
-func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
+func (s *server) GetHistoryByUser(ctx context.Context, request *pb.GetHistoryByUserRequest) (*pb.GetHistoryByUserResponse, error) {
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
 	userID := request.GetUserId()
@@ -216,13 +217,13 @@ func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserReq
 
 	switch userType {
 	case service.TypeCustomer:
-		filters["UserID"] = userID
+		filters["user_id"] = userID
 	case service.TypeDriver:
-		filters["DriverId"] = userID
+		filters["driver_id"] = userID
 	}
 
-	filters["IsArchived"] = request.GetIsArchived()
-	filters["Status"] = models.StatusDone
+	filters["is_archived"] = request.GetIsArchived()
+	filters["status"] = models.StatusDone
 
 	orders, total, err := s.orderRepository.FindAll(page, limit, filters)
 	if err != nil {
@@ -233,18 +234,19 @@ func (s *server) GetHistory(ctx context.Context, request *pb.GetHistoryByUserReq
 	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
 	for _, order := range ordersResponse {
 		ordersResponse = append(ordersResponse, &pb.OrderEntity{
-			Number:   order.Number,
-			Status:   order.Status,
-			Price:    order.Price,
-			UserId:   order.UserId,
-			DriverId: order.DriverId,
+			Number:     order.Number,
+			Status:     order.Status,
+			Price:      order.Price,
+			UserId:     order.UserId,
+			DriverId:   order.DriverId,
+			IsArchived: order.IsArchived,
 		})
 	}
 
 	return &pb.GetHistoryByUserResponse{Orders: ordersResponse, Total: total}, nil
 }
 
-func (s *server) GetAll(ctx context.Context, request *pb.GetAllByUserRequest) (*pb.GetAllByUserResponse, error) {
+func (s *server) GetAllByUser(ctx context.Context, request *pb.GetAllByUserRequest) (*pb.GetAllByUserResponse, error) {
 	page := int(request.GetPage())
 	limit := int(request.GetLimit())
 	userID := request.GetUserId()
@@ -258,12 +260,12 @@ func (s *server) GetAll(ctx context.Context, request *pb.GetAllByUserRequest) (*
 
 	switch userType {
 	case service.TypeCustomer:
-		filters["UserID"] = userID
+		filters["user_id"] = userID
 	case service.TypeDriver:
-		filters["DriverId"] = userID
+		filters["driver_id"] = userID
 	}
 
-	filters["Status"] = models.Status(request.GetStatus())
+	filters["status"] = models.Status(request.GetStatus())
 
 	orders, total, err := s.orderRepository.FindAll(page, limit, filters)
 	if err != nil {
@@ -274,11 +276,12 @@ func (s *server) GetAll(ctx context.Context, request *pb.GetAllByUserRequest) (*
 	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
 	for _, order := range ordersResponse {
 		ordersResponse = append(ordersResponse, &pb.OrderEntity{
-			Number:   order.Number,
-			Status:   order.Status,
-			Price:    order.Price,
-			UserId:   order.UserId,
-			DriverId: order.DriverId,
+			Number:     order.Number,
+			Status:     order.Status,
+			Price:      order.Price,
+			UserId:     order.UserId,
+			DriverId:   order.DriverId,
+			IsArchived: order.IsArchived,
 		})
 	}
 

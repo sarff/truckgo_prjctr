@@ -16,7 +16,7 @@ const (
 )
 
 func GetOrderPrice(ctx context.Context, origin, destination string) (float64, error) {
-	conn, err := grpc.NewClient("auth-server:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("172.0.0.8:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return 0.0, err
 	}
@@ -38,7 +38,7 @@ func GetOrderPrice(ctx context.Context, origin, destination string) (float64, er
 }
 
 func GetUserType(ctx context.Context, userID uint32) (string, error) {
-	conn, err := grpc.NewClient("user-server:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("172.0.0.10:50048", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return "", err
 	}

@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 func Initialize() (*gorm.DB, error) {
@@ -37,9 +38,9 @@ func Initialize() (*gorm.DB, error) {
 	} else {
 		user := os.Getenv("POSTGRES_USER")
 		pass := os.Getenv("POSTGRES_PASSWORD")
-		dbname := os.Getenv("POSTGRES_DB_AUTH")
+		dbname := os.Getenv("POSTGRES_DB_ORDER")
 
-		dsn := fmt.Sprintf("host=db_auth user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv",
+		dsn := fmt.Sprintf("host=db_order user=%s password=%s dbname=%s port=5432 sslmode=disable TimeZone=Europe/Kyiv",
 			user, pass, dbname)
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
