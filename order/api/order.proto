@@ -28,7 +28,7 @@ message CreateResponse {
 
 message UpdateStatusRequest {
   uint32 order_id = 1;
-  int32 status = 2;
+  Status status = 2;
 }
 
 message UpdateStatusResponse {
@@ -85,7 +85,9 @@ message GetHistoryByUserResponse {
 
 message GetAllByUserRequest {
   uint32 user_id = 1;
-  Status status = 2;
+  oneof optional_status {
+    Status status = 2;
+  }
   int32 page = 3;
   int32 limit = 4;
 }
@@ -101,6 +103,7 @@ message OrderEntity {
   double price = 3;
   uint32 user_id = 4;
   uint32 driver_id = 5;
+  bool is_archived = 6;
 }
 
 enum Status {

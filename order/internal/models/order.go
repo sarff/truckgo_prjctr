@@ -41,7 +41,7 @@ func generateOrderNumber() string {
 
 func ValidateStatus(order Order, newStatus Status) error {
 	currentStatus := order.Status
-	err := status.Errorf(codes.FailedPrecondition, "Cannot change %d order status to %d", newStatus, currentStatus)
+	err := status.Errorf(codes.FailedPrecondition, "Cannot change %d order status to %d", currentStatus, newStatus)
 
 	switch newStatus {
 	case StatusAccepted:
