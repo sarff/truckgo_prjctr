@@ -8,6 +8,7 @@ RUN go mod download
 COPY ./shipping ./shipping
 COPY ./shared ./shared
 COPY ./config.yaml ./config.yaml
+COPY ./user/grpcapi ./user/grpcapi
 
 RUN mkdir -p /app/logs
 

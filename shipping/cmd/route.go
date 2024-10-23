@@ -87,7 +87,7 @@ type Step struct {
 	Instruction string  `json:"instruction"`
 }
 
-func calculateRouteByCoordinates(ctx context.Context, start, end []float64) (*Segment, error) {
+func calculateRouteByCoordinatesImpl(ctx context.Context, start, end []float64) (*Segment, error) {
 	url := "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
 
 	reqBody := RouteRequest{
