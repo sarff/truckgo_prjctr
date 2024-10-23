@@ -2,6 +2,7 @@ package logging
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -9,7 +10,8 @@ import (
 
 func TestInitLogger(t *testing.T) {
 	tempDir := t.TempDir()
-	viper.Set("log_path", tempDir+"/testlog.log")
+	logFilePath := filepath.Join(tempDir, "testlog.log")
+	viper.Set("log_path", logFilePath)
 	viper.Set("log_level", "info")
 
 	logger, err := InitLogger("test")
@@ -20,11 +22,12 @@ func TestInitLogger(t *testing.T) {
 		t.Fatal("expected logger to be initialized, but got nil")
 	}
 
-	if _, err := os.Stat(tempDir + "/test_testlog.log"); os.IsNotExist(err) {
+	logFilePath = filepath.Join(tempDir, "test_testlog.log")
+	if _, err := os.Stat(logFilePath); os.IsNotExist(err) {
 		t.Fatalf("expected log file to be created, but it was not: %v", err)
 	}
 
-	err = os.Remove(tempDir + "/test_testlog.log")
+	err = os.Remove(logFilePath)
 	if err != nil {
 		t.Errorf("expected no error, but got: %v", err)
 	}
@@ -32,7 +35,8 @@ func TestInitLogger(t *testing.T) {
 
 func TestInitLoggerError(t *testing.T) {
 	tempDir := t.TempDir()
-	viper.Set("log_path", tempDir+"testlog.log")
+	logFilePath := filepath.Join(tempDir, "testlog.log")
+	viper.Set("log_path", logFilePath)
 	viper.Set("log_level", "info")
 
 	logger, err := InitLogger(tempDir)
