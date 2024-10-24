@@ -14,6 +14,7 @@ service Order {
   rpc GetOne(GetOneRequest) returns (GetOneResponse);
   rpc GetHistoryByUser(GetHistoryByUserRequest) returns (GetHistoryByUserResponse);
   rpc GetAllByUser(GetAllByUserRequest) returns (GetAllByUserResponse);
+  rpc SendOrderToDrivers(SendOrderToDriversRequest) returns (SendOrderToDriversResponse);
 }
 
 message CreateRequest {
@@ -97,13 +98,24 @@ message GetAllByUserResponse {
   int64 total = 2;
 }
 
+message SendOrderToDriversRequest {
+  uint32 order_id = 1;
+  uint32 user_id = 2;
+  string login = 3;
+}
+
+message SendOrderToDriversResponse {
+  repeated string message = 1;
+}
+
 message OrderEntity {
-  string number = 1;
-  Status status = 2;
-  double price = 3;
-  uint32 user_id = 4;
-  uint32 driver_id = 5;
-  bool is_archived = 6;
+  uint32 id = 1;
+  string number = 2;
+  Status status = 3;
+  double price = 4;
+  uint32 user_id = 5;
+  uint32 driver_id = 6;
+  bool is_archived = 7;
 }
 
 enum Status {

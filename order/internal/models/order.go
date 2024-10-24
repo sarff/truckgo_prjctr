@@ -2,8 +2,6 @@ package models
 
 import (
 	"github.com/google/uuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type Status int32
@@ -39,30 +37,33 @@ func generateOrderNumber() string {
 	return uuid.New().String()
 }
 
-func ValidateStatus(order Order, newStatus Status) error {
+func ValidateStatus(order Order, newStatus Status) bool {
 	currentStatus := order.Status
-	err := status.Errorf(codes.FailedPrecondition, "Cannot change %d order status to %d", currentStatus, newStatus)
 
 	switch newStatus {
 	case StatusAccepted:
 		if currentStatus != StatusNew {
-			return err
+			return false
 		}
 	case StatusInProgress:
 		if currentStatus != StatusAccepted {
-			return err
+			return false
 		}
 	case StatusCancelled:
 		if currentStatus != StatusAccepted {
-			return err
+			return false
 		}
 	case StatusDone:
 		if currentStatus != StatusInProgress {
-			return err
+			return false
+		}
+	case StatusNew:
+		if currentStatus != StatusAccepted {
+			return false
 		}
 	default:
-		return err
+		return false
 	}
 
-	return nil
+	return true
 }

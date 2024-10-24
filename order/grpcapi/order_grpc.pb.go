@@ -19,15 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Order_Create_FullMethodName           = "/truckgo.Order/Create"
-	Order_UpdateStatus_FullMethodName     = "/truckgo.Order/UpdateStatus"
-	Order_Accept_FullMethodName           = "/truckgo.Order/Accept"
-	Order_Decline_FullMethodName          = "/truckgo.Order/Decline"
-	Order_Cancel_FullMethodName           = "/truckgo.Order/Cancel"
-	Order_Archive_FullMethodName          = "/truckgo.Order/Archive"
-	Order_GetOne_FullMethodName           = "/truckgo.Order/GetOne"
-	Order_GetHistoryByUser_FullMethodName = "/truckgo.Order/GetHistoryByUser"
-	Order_GetAllByUser_FullMethodName     = "/truckgo.Order/GetAllByUser"
+	Order_Create_FullMethodName             = "/truckgo.Order/Create"
+	Order_UpdateStatus_FullMethodName       = "/truckgo.Order/UpdateStatus"
+	Order_Accept_FullMethodName             = "/truckgo.Order/Accept"
+	Order_Decline_FullMethodName            = "/truckgo.Order/Decline"
+	Order_Cancel_FullMethodName             = "/truckgo.Order/Cancel"
+	Order_Archive_FullMethodName            = "/truckgo.Order/Archive"
+	Order_GetOne_FullMethodName             = "/truckgo.Order/GetOne"
+	Order_GetHistoryByUser_FullMethodName   = "/truckgo.Order/GetHistoryByUser"
+	Order_GetAllByUser_FullMethodName       = "/truckgo.Order/GetAllByUser"
+	Order_SendOrderToDrivers_FullMethodName = "/truckgo.Order/SendOrderToDrivers"
 )
 
 // OrderClient is the client API for Order service.
@@ -43,6 +44,7 @@ type OrderClient interface {
 	GetOne(ctx context.Context, in *GetOneRequest, opts ...grpc.CallOption) (*GetOneResponse, error)
 	GetHistoryByUser(ctx context.Context, in *GetHistoryByUserRequest, opts ...grpc.CallOption) (*GetHistoryByUserResponse, error)
 	GetAllByUser(ctx context.Context, in *GetAllByUserRequest, opts ...grpc.CallOption) (*GetAllByUserResponse, error)
+	SendOrderToDrivers(ctx context.Context, in *SendOrderToDriversRequest, opts ...grpc.CallOption) (*SendOrderToDriversResponse, error)
 }
 
 type orderClient struct {
@@ -143,6 +145,16 @@ func (c *orderClient) GetAllByUser(ctx context.Context, in *GetAllByUserRequest,
 	return out, nil
 }
 
+func (c *orderClient) SendOrderToDrivers(ctx context.Context, in *SendOrderToDriversRequest, opts ...grpc.CallOption) (*SendOrderToDriversResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendOrderToDriversResponse)
+	err := c.cc.Invoke(ctx, Order_SendOrderToDrivers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServer is the server API for Order service.
 // All implementations must embed UnimplementedOrderServer
 // for forward compatibility.
@@ -156,6 +168,7 @@ type OrderServer interface {
 	GetOne(context.Context, *GetOneRequest) (*GetOneResponse, error)
 	GetHistoryByUser(context.Context, *GetHistoryByUserRequest) (*GetHistoryByUserResponse, error)
 	GetAllByUser(context.Context, *GetAllByUserRequest) (*GetAllByUserResponse, error)
+	SendOrderToDrivers(context.Context, *SendOrderToDriversRequest) (*SendOrderToDriversResponse, error)
 	mustEmbedUnimplementedOrderServer()
 }
 
@@ -192,6 +205,9 @@ func (UnimplementedOrderServer) GetHistoryByUser(context.Context, *GetHistoryByU
 }
 func (UnimplementedOrderServer) GetAllByUser(context.Context, *GetAllByUserRequest) (*GetAllByUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllByUser not implemented")
+}
+func (UnimplementedOrderServer) SendOrderToDrivers(context.Context, *SendOrderToDriversRequest) (*SendOrderToDriversResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendOrderToDrivers not implemented")
 }
 func (UnimplementedOrderServer) mustEmbedUnimplementedOrderServer() {}
 func (UnimplementedOrderServer) testEmbeddedByValue()               {}
@@ -376,6 +392,24 @@ func _Order_GetAllByUser_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Order_SendOrderToDrivers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendOrderToDriversRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServer).SendOrderToDrivers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Order_SendOrderToDrivers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServer).SendOrderToDrivers(ctx, req.(*SendOrderToDriversRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Order_ServiceDesc is the grpc.ServiceDesc for Order service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +452,10 @@ var Order_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllByUser",
 			Handler:    _Order_GetAllByUser_Handler,
+		},
+		{
+			MethodName: "SendOrderToDrivers",
+			Handler:    _Order_SendOrderToDrivers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -64,8 +65,9 @@ func (s *server) UpdateStatus(_ context.Context, request *pb.UpdateStatusRequest
 	}
 
 	newStatus := models.Status(request.GetStatus())
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -90,8 +92,9 @@ func (s *server) Accept(_ context.Context, request *pb.AcceptRequest) (*pb.Accep
 	}
 
 	newStatus := models.StatusAccepted
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -117,8 +120,9 @@ func (s *server) Decline(_ context.Context, request *pb.DeclineRequest) (*pb.Dec
 	}
 
 	newStatus := models.StatusNew
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -144,8 +148,9 @@ func (s *server) Cancel(_ context.Context, request *pb.CancelRequest) (*pb.Cance
 	}
 
 	newStatus := models.StatusCancelled
-	err = models.ValidateStatus(*order, newStatus)
-	if err != nil {
+	isValid := models.ValidateStatus(*order, newStatus)
+	if !isValid {
+		err = status.Errorf(codes.FailedPrecondition, "Cannot change order status to %d", newStatus)
 		s.log.Error("Invalid order status", "error", err)
 		return nil, err
 	}
@@ -196,6 +201,7 @@ func (s *server) GetOne(_ context.Context, request *pb.GetOneRequest) (*pb.GetOn
 	}
 
 	orderResponse := pb.OrderEntity{
+		Id:         order.ID,
 		Number:     order.Number,
 		Status:     pb.Status(order.Status),
 		Price:      order.Price,
@@ -238,6 +244,7 @@ func (s *server) GetHistoryByUser(ctx context.Context, request *pb.GetHistoryByU
 	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
 	for _, order := range orders {
 		ordersResponse = append(ordersResponse, &pb.OrderEntity{
+			Id:         order.ID,
 			Number:     order.Number,
 			Status:     pb.Status(order.Status),
 			Price:      order.Price,
@@ -282,6 +289,7 @@ func (s *server) GetAllByUser(ctx context.Context, request *pb.GetAllByUserReque
 	ordersResponse := make([]*pb.OrderEntity, 0, len(orders))
 	for _, order := range orders {
 		ordersResponse = append(ordersResponse, &pb.OrderEntity{
+			Id:         order.ID,
 			Number:     order.Number,
 			Status:     pb.Status(order.Status),
 			Price:      order.Price,
@@ -292,4 +300,39 @@ func (s *server) GetAllByUser(ctx context.Context, request *pb.GetAllByUserReque
 	}
 
 	return &pb.GetAllByUserResponse{Orders: ordersResponse, Total: total}, nil
+}
+
+func (s *server) SendOrderToDrivers(ctx context.Context, request *pb.SendOrderToDriversRequest) (*pb.SendOrderToDriversResponse, error) {
+	order, err := s.validateOrderID(request.GetOrderId())
+	if err != nil {
+		s.log.Error("Invalid request", "error", err)
+		return nil, err
+	}
+	if order.Status != models.StatusNew {
+		err = status.Errorf(codes.FailedPrecondition, "Incorrect order status %d", order.Status)
+		s.log.Error("Incorrect order status", "error", err)
+		return nil, err
+	}
+
+	userID := request.GetUserId()
+	if order.UserID != userID {
+		err = status.Errorf(codes.FailedPrecondition, "Order doesn't belong to user %d", userID)
+		s.log.Error("Order doesn't belong to user", "error", err)
+		return nil, err
+	}
+
+	login := request.GetLogin()
+	drivers, err := service.GetNearestDrivers(ctx, s.shippingClient, s.userClient, userID, login)
+	if err != nil {
+		s.log.Error("Cannot get nearest drivers", "error", err)
+		return nil, err
+	}
+
+	orderID := order.ID
+	messages := make([]string, 0, len(drivers))
+	for _, driverID := range drivers {
+		messages = append(messages, fmt.Sprintf("Sending order %d to driver %d", orderID, driverID))
+	}
+
+	return &pb.SendOrderToDriversResponse{Message: messages}, nil
 }
