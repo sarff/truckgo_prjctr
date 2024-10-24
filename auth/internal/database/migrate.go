@@ -43,7 +43,6 @@ func SeedDemoData(db *gorm.DB) error {
 	var i uint32
 	for i = 1; i <= 5; i++ {
 		users = append(users, models.Auth{
-			//ID:       i,
 			Login:    fmt.Sprintf("driver%d@example.com", i),
 			Password: pass,
 			TypeUser: "driver",
@@ -53,7 +52,6 @@ func SeedDemoData(db *gorm.DB) error {
 	// customers
 	for i = 6; i <= 10; i++ {
 		users = append(users, models.Auth{
-			//ID:       i,
 			Login:    fmt.Sprintf("customer%d@example.com", i),
 			Password: pass,
 			TypeUser: "customer",
