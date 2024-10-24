@@ -1,0 +1,22 @@
+FROM golang:1.23-alpine
+
+WORKDIR /app
+
+COPY ../go.mod ../go.sum ./
+RUN go mod download
+
+COPY ./payment ./payment
+COPY ./shared ./shared
+COPY ./config.yaml ./config.yaml
+COPY ./order/grpcapi ./order/grpcapi
+COPY ./user/grpcapi ./user/grpcapi
+
+RUN mkdir -p /app/logs
+
+WORKDIR /app
+
+RUN go build -o /app/payment/bin/server /app/payment/cmd/*.go
+
+EXPOSE 50050
+
+CMD ["/app/payment/bin/server"]

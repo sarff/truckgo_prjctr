@@ -87,6 +87,11 @@ services:
       ports:
         - "${DB_PAYMENT_PORT}:5432"
       restart: always
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
       volumes:
         - postgres_payment:/var/lib/postgresql/data
       networks:
@@ -171,6 +176,22 @@ services:
         app-network:
             ipv4_address: 172.0.0.10
 
+  payment:
+    container_name: truckgo_payment_server
+    build:
+      context: .
+      dockerfile: ./DockerfilePayment
+    depends_on:
+      db_payment:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+    ports:
+      - "50050:50050"
+    restart: always
+    networks:
+      app-network:
+        ipv4_address: 172.0.0.11
 
 volumes:
   postgres_auth:

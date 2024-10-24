@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package truckgo;
+
+option go_package = "github.com/alexandear/truckgo/grpcapi";
+
+service Payment {
+  rpc Pay(PayRequest) returns (PayResponse);
+  rpc CreatePaymentMethod(CreatePaymentMethodRequest) returns (CreatePaymentMethodResponse);
+  rpc DeletePaymentMethod(DeletePaymentMethodRequest) returns (DeletePaymentMethodResponse);
+}
+
+message PayRequest {
+  uint32 user_id = 1;
+  uint32 driver_id = 2;
+  uint32 amount = 3;
+  string currency = 4;
+}
+
+message PayResponse {
+  uint32  payment_id = 1;
+  Status status = 2;
+}
+
+message CreatePaymentMethodRequest {
+  uint32 user_id = 1;
+  string card_number = 2;
+  string card_expiration = 3;
+  string card_cvv = 4;
+  string card_holder_name = 5;
+}
+
+message CreatePaymentMethodResponse {
+  uint32  payment_method_id = 1;
+}
+
+message DeletePaymentMethodRequest {
+  uint32 payment_method_id = 1;
+}
+
+message DeletePaymentMethodResponse {
+  string message = 1;
+}
+
+enum Status {
+  STATUS_NEW = 0;
+  STATUS_SUCCESS = 1;
+  STATUS_FAIL = 2;
+  STATUS_REFUNDED = 3;
+}
