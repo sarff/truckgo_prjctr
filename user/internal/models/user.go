@@ -5,7 +5,7 @@ import (
 )
 
 type User struct {
-	ID         uint32    `gorm:"primary_key"`
+	ID         uint32    `gorm:"primary_key;autoIncrement"`
 	Login      string    `gorm:"unique;not null"` // email
 	FullName   string    `gorm:"not null"`
 	TypeUserID uint32    `gorm:"not null"`
@@ -21,12 +21,12 @@ type User struct {
 
 // TypeUser customer or driver.
 type TypeUser struct {
-	ID   uint32 `gorm:"primary_key"`
+	ID   uint32 `gorm:"primary_key;autoIncrement"`
 	Type string `gorm:"not null"`
 }
 
 type Driver struct {
-	ID        uint32 `gorm:"primaryKey"`
+	ID        uint32 `gorm:"primaryKey;autoIncrement"`
 	UserID    uint32 `gorm:"not null"`
 	User      User   `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 	License   string `gorm:"not null"`

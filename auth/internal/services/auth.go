@@ -3,13 +3,12 @@ package services
 import (
 	"context"
 	"fmt"
-	"regexp"
-	"time"
-
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"regexp"
+	"time"
 
 	authpb "github.com/alexandear/truckgo/auth/grpcapi"
 	"github.com/alexandear/truckgo/auth/internal/models"
@@ -32,7 +31,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
 	}
 	if req.TypeUser != "driver" && req.TypeUser != "customer" {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid type format %s", req.TypeUser)
 	}
 
 	err := s.checkUserByLogin(req.Login)
