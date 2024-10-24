@@ -149,12 +149,24 @@ func (u *UserServiceServer) UpdateUser(_ context.Context, req *userpb.UpdateUser
 		return nil, fmt.Errorf("failed to update user: %v", err)
 	}
 
-	updateUser.FullName = req.FullName
-	updateUser.Status = req.Status
-	updateUser.Phone = req.Phone
-	updateUser.Rating = req.Rating
-	updateUser.Latitude = req.Latitude
-	updateUser.Longitude = req.Longitude
+	if req.FullName != "" {
+		updateUser.FullName = req.FullName
+	}
+	if req.Status != updateUser.Status {
+		updateUser.Status = req.Status
+	}
+	if req.Phone != "" {
+		updateUser.Phone = req.Phone
+	}
+	if req.Rating != 0 {
+		updateUser.Rating = req.Rating
+	}
+	if req.Latitude != 0 {
+		updateUser.Latitude = req.Latitude
+	}
+	if req.Longitude != 0 {
+		updateUser.Longitude = req.Longitude
+	}
 
 	if err := u.DB.Save(&updateUser).Error; err != nil {
 		u.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
@@ -183,15 +195,15 @@ func (u *UserServiceServer) GetType(_ context.Context, req *userpb.TypeRequest) 
 
 	return &userpb.TypeResponse{
 		Type:    typeUser.Type,
-		Message: fmt.Sprintf("User with Login %v has type %s", req.UserId, typeUser.Type),
+		Message: fmt.Sprintf("User with ID %v has type %s", req.UserId, typeUser.Type),
 	}, nil
 }
 
 func (u *UserServiceServer) GetUser(_ context.Context, req *userpb.UserRequest) (*userpb.UserResponse, error) {
 	var user *models.User
 
-	if err := u.DB.First(&user, req.Id).Error; err != nil {
-		if err := u.DB.First(&user, req.Login).Error; err != nil {
+	if err := u.DB.First(&user, "id = ?", req.Id).Error; err != nil {
+		if err := u.DB.First(&user, "login = ?", req.Login).Error; err != nil {
 			u.Logger.Info("Record not Found", "GetUser", err)
 			return nil, status.Error(codes.NotFound, "Record not found")
 		}
