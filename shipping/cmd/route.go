@@ -24,9 +24,9 @@ type GeocodeResponse struct {
 	} `json:"features"`
 }
 
-func geocode(ctx context.Context, address string) ([]float64, error) {
+func geocode(ctx context.Context, apiKey string, address string) ([]float64, error) {
 	escapedAddress := url.QueryEscape(address)
-	url := fmt.Sprintf("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s", getAPIKey(), escapedAddress)
+	url := fmt.Sprintf("https://api.openrouteservice.org/geocode/search?api_key=%s&text=%s", apiKey, escapedAddress)
 
 	fmt.Printf("URL = %v\n", url)
 
@@ -87,7 +87,7 @@ type Step struct {
 	Instruction string  `json:"instruction"`
 }
 
-func calculateRouteByCoordinates(ctx context.Context, start, end []float64) (*Segment, error) {
+func calculateRouteByCoordinatesImpl(ctx context.Context, apiKey string, start, end []float64) (*Segment, error) {
 	url := "https://api.openrouteservice.org/v2/directions/driving-car/geojson"
 
 	reqBody := RouteRequest{
@@ -107,7 +107,7 @@ func calculateRouteByCoordinates(ctx context.Context, start, end []float64) (*Se
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", getAPIKey())
+	req.Header.Set("Authorization", apiKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}

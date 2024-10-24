@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 
 	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 func getStartPrice() float64 {
@@ -32,12 +34,14 @@ func priceByFormula(distance float64) float64 {
 
 type server struct {
 	grpcapiShipping.UnimplementedShippingServiceServer
+
+	userClient userpb.UserServiceClient
 }
 
 func (s *server) GetCoordinatesByAddress(ctx context.Context,
 	req *grpcapiShipping.LocationRequest,
 ) (*grpcapiShipping.LocationResponse, error) {
-	coordinates, err := geocode(ctx, req.Address)
+	coordinates, err := geocode(ctx, getAPIKey(), req.Address)
 	if err != nil {
 		return nil, fmt.Errorf("error during getting coordinates: %v", err)
 	}
@@ -48,51 +52,15 @@ func (s *server) GetCoordinatesByAddress(ctx context.Context,
 	}, nil
 }
 
-func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceRequest) (*grpcapiShipping.PriceResponse, error) {
-	res, err := s.CalculateRoute(ctx, &grpcapiShipping.RouteRequest{
-		Origin:      req.Origin,
-		Destination: req.Destination,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO some smart calculations
-	price := priceByFormula(res.Distance)
-
-	return &grpcapiShipping.PriceResponse{
-		Message:  "The price calculated successfully!",
-		Price:    price,
-		Distance: res.Distance,
-		Time:     res.Time,
-	}, nil
-}
-
-func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteRequest) (*grpcapiShipping.RouteResponse, error) {
-	// log, err := logging.InitLogger(serviceName)
-	// if err != nil {
-	// 	return &grpcapiShipping.RouteResponse{}, err
-	// }
-
-	fmt.Printf("Origin: %v\n", req.Origin)
-	fmt.Printf("Destination: %v\n", req.Destination)
-
-	startPoint, err := geocode(ctx, req.Origin)
-	if err != nil {
-		return nil, fmt.Errorf("error during getting origin coordinates: %v", err)
-	}
-
-	endPoint, err := geocode(ctx, req.Destination)
-	if err != nil {
-		return nil, fmt.Errorf("error during getting destination coordinates: %v", err)
-	}
-
-	fmt.Printf("Origin coordinates: %v\n", startPoint)
-	fmt.Printf("Destination coordinates: %v\n", endPoint)
-
+func (s *server) CalculateRouteByCoordinates(ctx context.Context,
+	req *grpcapiShipping.CoordinatesRouteRequest,
+) (*grpcapiShipping.RouteResponse, error) {
 	var steps []*grpcapiShipping.Step
 
-	segment, err := calculateRouteByCoordinates(ctx, startPoint, endPoint)
+	startPoint := []float64{req.OriginLongitude, req.OriginLatitude}
+	endPoint := []float64{req.DestinationLongitude, req.DestinationLatitude}
+
+	segment, err := calculateRouteByCoordinatesImpl(ctx, getAPIKey(), startPoint, endPoint)
 	if err != nil {
 		return nil, fmt.Errorf("error during route calculation: %v", err)
 	}
@@ -118,11 +86,71 @@ func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteR
 	}, nil
 }
 
-func (s *server) FindTheNearestDriver(ctx context.Context,
+func (s *server) CalculateRoute(ctx context.Context, req *grpcapiShipping.RouteRequest) (*grpcapiShipping.RouteResponse, error) {
+	// log, err := logging.InitLogger(serviceName)
+	// if err != nil {
+	// 	return &grpcapiShipping.RouteResponse{}, err
+	// }
+
+	fmt.Printf("Origin: %v\n", req.Origin)
+	fmt.Printf("Destination: %v\n", req.Destination)
+
+	originResponse, err := s.GetCoordinatesByAddress(ctx, &grpcapiShipping.LocationRequest{Address: req.Origin})
+	if err != nil {
+		return nil, fmt.Errorf("error during getting origin coordinates: %v", err)
+	}
+
+	destinationResponse, err := s.GetCoordinatesByAddress(ctx, &grpcapiShipping.LocationRequest{Address: req.Destination})
+	if err != nil {
+		return nil, fmt.Errorf("error during getting destination coordinates: %v", err)
+	}
+
+	fmt.Printf("Origin coordinates: Longitude: %v, Latitude: %v\n", originResponse.Longitude, originResponse.Latitude)
+	fmt.Printf("Destination coordinates: Longitude: %v, Latitude: %v\n", destinationResponse.Longitude, destinationResponse.Latitude)
+
+	return s.CalculateRouteByCoordinates(ctx, &grpcapiShipping.CoordinatesRouteRequest{
+		OriginLongitude:      originResponse.Longitude,
+		OriginLatitude:       originResponse.Latitude,
+		DestinationLongitude: destinationResponse.Longitude,
+		DestinationLatitude:  destinationResponse.Latitude,
+	})
+}
+
+func (s *server) CalculatePrice(ctx context.Context, req *grpcapiShipping.PriceRequest) (*grpcapiShipping.PriceResponse, error) {
+	res, err := s.CalculateRoute(ctx, &grpcapiShipping.RouteRequest{
+		Origin:      req.Origin,
+		Destination: req.Destination,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO some smart calculations
+	price := priceByFormula(res.Distance)
+
+	return &grpcapiShipping.PriceResponse{
+		Message:  "The price calculated successfully!",
+		Price:    price,
+		Distance: res.Distance,
+		Time:     res.Time,
+	}, nil
+}
+
+func (s *server) FindTheNearestDrivers(ctx context.Context,
 	req *grpcapiShipping.DriverRequest,
 ) (*grpcapiShipping.DriverResponse, error) {
-	if len(req.Drivers) == 0 {
+	if req.DriversCount == 0 {
 		return nil, errors.New("no drivers were provided")
+	}
+
+	if req.ClientLatitude == 0 || req.ClientLongitude == 0 {
+		return nil, errors.New("client coordinates are incorrect")
+	}
+
+	resp, err := s.userClient.ListDrivers(ctx, &userpb.ListDriverRequest{})
+	fmt.Printf("Drivers: %v\n", resp.Drivers)
+	if err != nil {
+		return nil, err
 	}
 
 	type DriverDistance struct {
@@ -130,39 +158,61 @@ func (s *server) FindTheNearestDriver(ctx context.Context,
 		distance float64
 		time     float64
 	}
-	var minDriverDistance *DriverDistance = nil
+	driverDistances := make([]*DriverDistance, 0)
 
-	for _, driver := range req.Drivers {
-		route, err := s.CalculateRoute(ctx, &grpcapiShipping.RouteRequest{})
-		if err == nil {
-			if minDriverDistance == nil {
-				minDriverDistance = &DriverDistance{
-					id:       driver.Id,
-					distance: route.Distance,
-					time:     route.Time,
-				}
-			} else if route.Time < minDriverDistance.time {
-				minDriverDistance.id = driver.Id
-				minDriverDistance.distance = route.Distance
-				minDriverDistance.time = route.Time
-			}
+	for _, driver := range resp.Drivers {
+		route, err := s.CalculateRouteByCoordinates(ctx, &grpcapiShipping.CoordinatesRouteRequest{
+			OriginLongitude:      driver.Longitude,
+			OriginLatitude:       driver.Latitude,
+			DestinationLongitude: req.ClientLongitude,
+			DestinationLatitude:  req.ClientLatitude,
+		})
+		if err != nil {
+			// TODO think what is better to do in this case
+			continue
 		}
+
+		driverDistances = append(driverDistances, &DriverDistance{
+			id:       driver.Id,
+			distance: route.Distance,
+			time:     route.Time,
+		})
 	}
 
-	if minDriverDistance == nil {
-		return nil, errors.New("cannot find driver with min distance, addresses are incorrect")
+	findNearests := func(drivers []*DriverDistance, count uint32) []uint32 {
+		if len(drivers) == 0 {
+			return nil
+		}
+
+		var driverCount uint32
+		driverLen := len(drivers)
+		if driverLen <= int(^uint32(0)) {
+			driverCount = uint32(driverLen)
+		} else {
+			// impossible case, but added for linter
+			driverCount = ^uint32(0)
+		}
+		if count > driverCount {
+			count = driverCount
+		}
+
+		sort.Slice(drivers, func(i, j int) bool {
+			return drivers[i].time < drivers[j].time
+		})
+		res := make([]uint32, 0, count)
+		for i := uint32(0); i < count; i++ {
+			res = append(res, drivers[i].id)
+		}
+		return res
+	}
+
+	nearestDrivers := findNearests(driverDistances, req.DriversCount)
+	if len(nearestDrivers) == 0 {
+		return nil, errors.New("cannot find drivers with min distance, addresses are incorrect")
 	}
 
 	return &grpcapiShipping.DriverResponse{
-		Id:       minDriverDistance.id,
-		Distance: minDriverDistance.distance,
-		Duration: minDriverDistance.time,
-		Message:  "Driver was found!",
-	}, nil
-}
-
-func (s *server) TestFunc(ctx context.Context, req *grpcapiShipping.TestRequest) (*grpcapiShipping.TestResponse, error) {
-	return &grpcapiShipping.TestResponse{
-		Message: "Some testing!",
+		DriverIds: nearestDrivers,
+		Message:   "Drivers were found!",
 	}, nil
 }

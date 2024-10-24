@@ -6,10 +6,10 @@ option go_package = "github.com/alexandear/truckgo/grpcapi";
 
 service ShippingService {
     rpc GetCoordinatesByAddress(LocationRequest) returns (LocationResponse);
-    rpc CalculatePrice(PriceRequest) returns (PriceResponse);
+    rpc CalculateRouteByCoordinates(CoordinatesRouteRequest) returns (RouteResponse);
     rpc CalculateRoute(RouteRequest) returns (RouteResponse);
-    rpc FindTheNearestDriver(DriverRequest) returns (DriverResponse);
-    rpc TestFunc(TestRequest) returns (TestResponse);
+    rpc CalculatePrice(PriceRequest) returns (PriceResponse);
+    rpc FindTheNearestDrivers(DriverRequest) returns (DriverResponse);
 }
 
 message LocationRequest {
@@ -17,20 +17,15 @@ message LocationRequest {
 }
 
 message LocationResponse {
-    double Latitude = 1;
-    double Longitude = 2;
+    double latitude = 1;
+    double longitude = 2;
 }
 
-message PriceRequest {
-    string origin = 1;
-    string destination = 2;
-}
-
-message PriceResponse {
-    string message = 1;
-    double price = 2;
-    double distance = 3;
-    double time = 4;
+message CoordinatesRouteRequest {
+    double origin_latitude = 1;
+    double origin_longitude = 2;
+    double destination_latitude = 3;
+    double destination_longitude = 4;
 }
 
 message RouteRequest {
@@ -45,34 +40,31 @@ message RouteResponse {
     double time = 4;
 }
 
+message PriceRequest {
+    string origin = 1;
+    string destination = 2;
+}
+
+message PriceResponse {
+    string message = 1;
+    double price = 2;
+    double distance = 3;
+    double time = 4;
+}
+
 message Step {
     string instruction = 1;
     double distance = 2;
     double duration = 3;
 }
 
-message DriverData {
-    uint32 Id = 1;
-    double Latitude = 2;
-    double Longitude = 3;
-}
-
 message DriverRequest {
-    string clientPosition = 1;
-    repeated DriverData drivers = 2;
+    double client_latitude = 1;
+    double client_longitude = 2;
+    uint32 drivers_count = 3;
 }
 
 message DriverResponse {
-    uint32 id = 1;
-    double distance = 2;
-    double duration = 3;
-    string message = 4;
-}
-
-message TestRequest {
-    string message = 1;
-}
-
-message TestResponse {
-    string message = 1;
+    repeated uint32 driver_ids = 1;
+    string message = 2;
 }

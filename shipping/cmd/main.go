@@ -6,11 +6,13 @@ import (
 	"os"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/alexandear/truckgo/shared/config"
 	"github.com/alexandear/truckgo/shared/logging"
 	"github.com/alexandear/truckgo/shipping/database"
 	grpcapiShipping "github.com/alexandear/truckgo/shipping/grpc/grpcapi"
+	userpb "github.com/alexandear/truckgo/user/grpcapi"
 )
 
 const serviceName = "SHIPPING"
@@ -64,7 +66,15 @@ func startGRPCServer(log *logging.Logger) error {
 	}
 
 	grpcServer := grpc.NewServer()
-	grpcapiShipping.RegisterShippingServiceServer(grpcServer, &server{})
+
+	userClient, err := initUserClient()
+	if err != nil {
+		return fmt.Errorf("failed to get user client: %v", err)
+	}
+
+	grpcapiShipping.RegisterShippingServiceServer(grpcServer, &server{
+		userClient: userClient,
+	})
 
 	if err := grpcServer.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
@@ -73,4 +83,13 @@ func startGRPCServer(log *logging.Logger) error {
 	log.Info("gRPC server is starting...")
 
 	return nil
+}
+
+func initUserClient() (userpb.UserServiceClient, error) {
+	conn, err := grpc.NewClient("172.0.0.10:50048", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, err
+	}
+
+	return userpb.NewUserServiceClient(conn), nil
 }

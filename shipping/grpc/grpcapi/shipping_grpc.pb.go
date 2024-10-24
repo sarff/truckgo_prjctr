@@ -19,11 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ShippingService_GetCoordinatesByAddress_FullMethodName = "/truckgo.ShippingService/GetCoordinatesByAddress"
-	ShippingService_CalculatePrice_FullMethodName          = "/truckgo.ShippingService/CalculatePrice"
-	ShippingService_CalculateRoute_FullMethodName          = "/truckgo.ShippingService/CalculateRoute"
-	ShippingService_FindTheNearestDriver_FullMethodName    = "/truckgo.ShippingService/FindTheNearestDriver"
-	ShippingService_TestFunc_FullMethodName                = "/truckgo.ShippingService/TestFunc"
+	ShippingService_GetCoordinatesByAddress_FullMethodName     = "/truckgo.ShippingService/GetCoordinatesByAddress"
+	ShippingService_CalculateRouteByCoordinates_FullMethodName = "/truckgo.ShippingService/CalculateRouteByCoordinates"
+	ShippingService_CalculateRoute_FullMethodName              = "/truckgo.ShippingService/CalculateRoute"
+	ShippingService_CalculatePrice_FullMethodName              = "/truckgo.ShippingService/CalculatePrice"
+	ShippingService_FindTheNearestDrivers_FullMethodName       = "/truckgo.ShippingService/FindTheNearestDrivers"
 )
 
 // ShippingServiceClient is the client API for ShippingService service.
@@ -31,10 +31,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ShippingServiceClient interface {
 	GetCoordinatesByAddress(ctx context.Context, in *LocationRequest, opts ...grpc.CallOption) (*LocationResponse, error)
-	CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
+	CalculateRouteByCoordinates(ctx context.Context, in *CoordinatesRouteRequest, opts ...grpc.CallOption) (*RouteResponse, error)
 	CalculateRoute(ctx context.Context, in *RouteRequest, opts ...grpc.CallOption) (*RouteResponse, error)
-	FindTheNearestDriver(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
-	TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error)
+	CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error)
+	FindTheNearestDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error)
 }
 
 type shippingServiceClient struct {
@@ -55,10 +55,10 @@ func (c *shippingServiceClient) GetCoordinatesByAddress(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *shippingServiceClient) CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error) {
+func (c *shippingServiceClient) CalculateRouteByCoordinates(ctx context.Context, in *CoordinatesRouteRequest, opts ...grpc.CallOption) (*RouteResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PriceResponse)
-	err := c.cc.Invoke(ctx, ShippingService_CalculatePrice_FullMethodName, in, out, cOpts...)
+	out := new(RouteResponse)
+	err := c.cc.Invoke(ctx, ShippingService_CalculateRouteByCoordinates_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,20 +75,20 @@ func (c *shippingServiceClient) CalculateRoute(ctx context.Context, in *RouteReq
 	return out, nil
 }
 
-func (c *shippingServiceClient) FindTheNearestDriver(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
+func (c *shippingServiceClient) CalculatePrice(ctx context.Context, in *PriceRequest, opts ...grpc.CallOption) (*PriceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DriverResponse)
-	err := c.cc.Invoke(ctx, ShippingService_FindTheNearestDriver_FullMethodName, in, out, cOpts...)
+	out := new(PriceResponse)
+	err := c.cc.Invoke(ctx, ShippingService_CalculatePrice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *shippingServiceClient) TestFunc(ctx context.Context, in *TestRequest, opts ...grpc.CallOption) (*TestResponse, error) {
+func (c *shippingServiceClient) FindTheNearestDrivers(ctx context.Context, in *DriverRequest, opts ...grpc.CallOption) (*DriverResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TestResponse)
-	err := c.cc.Invoke(ctx, ShippingService_TestFunc_FullMethodName, in, out, cOpts...)
+	out := new(DriverResponse)
+	err := c.cc.Invoke(ctx, ShippingService_FindTheNearestDrivers_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,10 +100,10 @@ func (c *shippingServiceClient) TestFunc(ctx context.Context, in *TestRequest, o
 // for forward compatibility.
 type ShippingServiceServer interface {
 	GetCoordinatesByAddress(context.Context, *LocationRequest) (*LocationResponse, error)
-	CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error)
+	CalculateRouteByCoordinates(context.Context, *CoordinatesRouteRequest) (*RouteResponse, error)
 	CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error)
-	FindTheNearestDriver(context.Context, *DriverRequest) (*DriverResponse, error)
-	TestFunc(context.Context, *TestRequest) (*TestResponse, error)
+	CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error)
+	FindTheNearestDrivers(context.Context, *DriverRequest) (*DriverResponse, error)
 	mustEmbedUnimplementedShippingServiceServer()
 }
 
@@ -117,17 +117,17 @@ type UnimplementedShippingServiceServer struct{}
 func (UnimplementedShippingServiceServer) GetCoordinatesByAddress(context.Context, *LocationRequest) (*LocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCoordinatesByAddress not implemented")
 }
-func (UnimplementedShippingServiceServer) CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CalculatePrice not implemented")
+func (UnimplementedShippingServiceServer) CalculateRouteByCoordinates(context.Context, *CoordinatesRouteRequest) (*RouteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CalculateRouteByCoordinates not implemented")
 }
 func (UnimplementedShippingServiceServer) CalculateRoute(context.Context, *RouteRequest) (*RouteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CalculateRoute not implemented")
 }
-func (UnimplementedShippingServiceServer) FindTheNearestDriver(context.Context, *DriverRequest) (*DriverResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FindTheNearestDriver not implemented")
+func (UnimplementedShippingServiceServer) CalculatePrice(context.Context, *PriceRequest) (*PriceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CalculatePrice not implemented")
 }
-func (UnimplementedShippingServiceServer) TestFunc(context.Context, *TestRequest) (*TestResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TestFunc not implemented")
+func (UnimplementedShippingServiceServer) FindTheNearestDrivers(context.Context, *DriverRequest) (*DriverResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindTheNearestDrivers not implemented")
 }
 func (UnimplementedShippingServiceServer) mustEmbedUnimplementedShippingServiceServer() {}
 func (UnimplementedShippingServiceServer) testEmbeddedByValue()                         {}
@@ -168,20 +168,20 @@ func _ShippingService_GetCoordinatesByAddress_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ShippingService_CalculatePrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PriceRequest)
+func _ShippingService_CalculateRouteByCoordinates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CoordinatesRouteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ShippingServiceServer).CalculatePrice(ctx, in)
+		return srv.(ShippingServiceServer).CalculateRouteByCoordinates(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ShippingService_CalculatePrice_FullMethodName,
+		FullMethod: ShippingService_CalculateRouteByCoordinates_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShippingServiceServer).CalculatePrice(ctx, req.(*PriceRequest))
+		return srv.(ShippingServiceServer).CalculateRouteByCoordinates(ctx, req.(*CoordinatesRouteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -204,38 +204,38 @@ func _ShippingService_CalculateRoute_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ShippingService_FindTheNearestDriver_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _ShippingService_CalculatePrice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PriceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShippingServiceServer).CalculatePrice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShippingService_CalculatePrice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShippingServiceServer).CalculatePrice(ctx, req.(*PriceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ShippingService_FindTheNearestDrivers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DriverRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ShippingServiceServer).FindTheNearestDriver(ctx, in)
+		return srv.(ShippingServiceServer).FindTheNearestDrivers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ShippingService_FindTheNearestDriver_FullMethodName,
+		FullMethod: ShippingService_FindTheNearestDrivers_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShippingServiceServer).FindTheNearestDriver(ctx, req.(*DriverRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ShippingService_TestFunc_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TestRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ShippingServiceServer).TestFunc(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ShippingService_TestFunc_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ShippingServiceServer).TestFunc(ctx, req.(*TestRequest))
+		return srv.(ShippingServiceServer).FindTheNearestDrivers(ctx, req.(*DriverRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -252,20 +252,20 @@ var ShippingService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ShippingService_GetCoordinatesByAddress_Handler,
 		},
 		{
-			MethodName: "CalculatePrice",
-			Handler:    _ShippingService_CalculatePrice_Handler,
+			MethodName: "CalculateRouteByCoordinates",
+			Handler:    _ShippingService_CalculateRouteByCoordinates_Handler,
 		},
 		{
 			MethodName: "CalculateRoute",
 			Handler:    _ShippingService_CalculateRoute_Handler,
 		},
 		{
-			MethodName: "FindTheNearestDriver",
-			Handler:    _ShippingService_FindTheNearestDriver_Handler,
+			MethodName: "CalculatePrice",
+			Handler:    _ShippingService_CalculatePrice_Handler,
 		},
 		{
-			MethodName: "TestFunc",
-			Handler:    _ShippingService_TestFunc_Handler,
+			MethodName: "FindTheNearestDrivers",
+			Handler:    _ShippingService_FindTheNearestDrivers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
