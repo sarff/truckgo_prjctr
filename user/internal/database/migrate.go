@@ -57,14 +57,12 @@ func SeedDemoData(db *gorm.DB) error {
 		lat, _ := gofakeit.LatitudeInRange(50.150001, 50.700001)
 		long, _ := gofakeit.LongitudeInRange(30.100001, 30.990001)
 		drivers = append(drivers, models.Driver{
-			ID:        i,
 			UserID:    i,
 			License:   gofakeit.Numerify("########"),
 			CarModel:  gofakeit.RandomString([]string{"VW", "Audi", "BMW", "Volvo"}),
 			CarNumber: gofakeit.Numerify("АА###МЕ"),
 		})
 		users = append(users, models.User{
-			ID:         i,
 			Login:      fmt.Sprintf("driver%d@example.com", i),
 			FullName:   gofakeit.LastName(),
 			TypeUserID: 2,
@@ -81,7 +79,6 @@ func SeedDemoData(db *gorm.DB) error {
 		lat, _ := gofakeit.LatitudeInRange(50.150001, 50.700001)
 		long, _ := gofakeit.LongitudeInRange(30.100001, 30.990001)
 		users = append(users, models.User{
-			ID:         i,
 			Login:      fmt.Sprintf("customer%d@example.com", i),
 			FullName:   gofakeit.LastName(),
 			TypeUserID: 1,

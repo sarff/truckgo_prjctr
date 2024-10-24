@@ -52,7 +52,7 @@ func generateJWT(login string) (string, error) {
 }
 
 func (s *AuthServiceServer) checkUserByLogin(login string) error {
-	if err := s.DB.Where("Login = ?", login).First(&s.Auth).Error; err != nil {
+	if err := s.DB.Where("login = ?", login).First(&s.Auth).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			s.Logger.Error("user not found", logging.ErrUserNotFound, err)
 			return fmt.Errorf("user with Login %s not found", login)

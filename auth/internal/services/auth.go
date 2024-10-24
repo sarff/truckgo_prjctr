@@ -32,7 +32,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
 	}
 	if req.TypeUser != "driver" && req.TypeUser != "customer" {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid Login format %s", req.Login)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid type format %s", req.TypeUser)
 	}
 
 	err := s.checkUserByLogin(req.Login)
