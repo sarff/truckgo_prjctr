@@ -11,6 +11,7 @@ import (
 )
 
 func newMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
+	t.Helper()
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("failed to open sqlmock database: %v", err)

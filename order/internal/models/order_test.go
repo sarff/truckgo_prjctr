@@ -54,13 +54,13 @@ func TestValidateStatus(t *testing.T) {
 			want:      false,
 		},
 		{
-			name:      "Valid state change from accepted to cancelled",
+			name:      "Valid state change from accepted to canceled",
 			order:     Order{Status: StatusAccepted},
 			newStatus: StatusCancelled,
 			want:      true,
 		},
 		{
-			name:      "Invalid state change from in progress to cancelled",
+			name:      "Invalid state change from in progress to canceled",
 			order:     Order{Status: StatusInProgress},
 			newStatus: StatusCancelled,
 			want:      false,
@@ -72,7 +72,7 @@ func TestValidateStatus(t *testing.T) {
 			want:      true,
 		},
 		{
-			name:      "Invalid state change from cancelled in progress to done",
+			name:      "Invalid state change from canceled in progress to done",
 			order:     Order{Status: StatusCancelled},
 			newStatus: StatusDone,
 			want:      false,
