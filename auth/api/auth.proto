@@ -17,9 +17,9 @@ service AuthService {
 }
 
 message RegisterRequest {
-  string Login = 1;
-  string Password = 2;
-  string TypeUser = 3; //customer or driver
+  string login = 1;
+  string password = 2;
+  string type_user = 3; //customer or driver
 }
 
 message RegisterResponse {
@@ -27,8 +27,8 @@ message RegisterResponse {
 }
 
 message LoginRequest {
-  string Login = 1;
-  string Password = 2;
+  string login = 1;
+  string password = 2;
 }
 
 message LoginResponse {
@@ -37,8 +37,8 @@ message LoginResponse {
 }
 
 message ValidateTokenRequest {
-  string Login = 1;
-  string Token = 2;
+  string login = 1;
+  string token = 2;
 }
 
 message ValidateTokenResponse {
@@ -46,10 +46,10 @@ message ValidateTokenResponse {
 }
 
 message ChangePasswordRequest {
-  string Login = 1;
-  string Token = 2;
-  string OldPassword = 3;
-  string NewPassword = 4;
+  string login = 1;
+  string token = 2;
+  string old_password = 3;
+  string new_password = 4;
 }
 
 message ChangePasswordResponse {

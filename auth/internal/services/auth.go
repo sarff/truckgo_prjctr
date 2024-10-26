@@ -35,7 +35,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 		return nil, status.Errorf(codes.InvalidArgument, "invalid type format %s", req.TypeUser)
 	}
 
-	err := s.checkUserByLogin(req.Login)
+	err := s.checkUserByLogin(ctx, req.Login)
 	if err == nil {
 		s.Logger.Info("user with Login %s already exists", logging.ErrUserAlreadyExists, req.Login)
 		return nil, status.Errorf(codes.AlreadyExists, "user with Login %s already exists", req.Login)
@@ -55,7 +55,7 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 		UpdatedAt: time.Now(),
 	}
 
-	if err = s.DB.Create(&newUser).Error; err != nil {
+	if err = s.DB.WithContext(ctx).Create(&newUser).Error; err != nil {
 		s.Logger.Error("failed to create user", logging.ErrDBCreateFailed, err)
 		return nil, status.Errorf(codes.Internal, "failed to create user: %v", err)
 	}
@@ -70,8 +70,8 @@ func (s *AuthServiceServer) Register(ctx context.Context, req *authpb.RegisterRe
 	}, nil
 }
 
-func (s *AuthServiceServer) Login(_ context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
-	err := s.checkUserByLogin(req.Login)
+func (s *AuthServiceServer) Login(ctx context.Context, req *authpb.LoginRequest) (*authpb.LoginResponse, error) {
+	err := s.checkUserByLogin(ctx, req.Login)
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +140,12 @@ func (s *AuthServiceServer) ValidateToken(_ context.Context,
 func (s *AuthServiceServer) ChangePassword(ctx context.Context,
 	req *authpb.ChangePasswordRequest,
 ) (*authpb.ChangePasswordResponse, error) {
-	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Token: req.Token})
+	tokenValidationRes, err := s.ValidateToken(ctx, &authpb.ValidateTokenRequest{Login: req.Login, Token: req.Token})
 	if err != nil || !tokenValidationRes.IsValid {
 		return nil, status.Error(codes.InvalidArgument, "invalid or expired token")
 	}
 
-	err = s.checkUserByLogin(req.Login)
+	err = s.checkUserByLogin(ctx, req.Login)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func (s *AuthServiceServer) ChangePassword(ctx context.Context,
 	}
 
 	s.Auth.Password = hashedNewPassword
-	if err = s.DB.Save(&s.Auth).Error; err != nil {
+	if err = s.DB.WithContext(ctx).Save(&s.Auth).Error; err != nil {
 		s.Logger.Error("failed to update user", logging.ErrDBUpdateFailed, err)
 		return nil, status.Errorf(codes.Internal, "failed to update password: %v", err)
 	}

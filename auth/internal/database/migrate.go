@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/spf13/viper"
@@ -10,8 +11,8 @@ import (
 	"github.com/alexandear/truckgo/auth/internal/services"
 )
 
-func Migrate(db *gorm.DB) error {
-	if err := db.AutoMigrate(
+func Migrate(ctx context.Context, db *gorm.DB) error {
+	if err := db.WithContext(ctx).AutoMigrate(
 		&models.Auth{}, // auth
 	); err != nil {
 		return err
@@ -19,10 +20,10 @@ func Migrate(db *gorm.DB) error {
 
 	if viper.GetBool("is_demo") {
 		var count int64
-		db.Model(&models.Auth{}).Count(&count)
+		db.WithContext(ctx).Model(&models.Auth{}).Count(&count)
 
 		if count == 0 {
-			err := SeedDemoData(db)
+			err := SeedDemoData(ctx, db)
 			if err != nil {
 				return err
 			}
@@ -31,7 +32,7 @@ func Migrate(db *gorm.DB) error {
 	return nil
 }
 
-func SeedDemoData(db *gorm.DB) error {
+func SeedDemoData(ctx context.Context, db *gorm.DB) error {
 	pass, err := services.HashPassword("password123")
 	if err != nil {
 		return err
@@ -59,7 +60,7 @@ func SeedDemoData(db *gorm.DB) error {
 	}
 
 	for _, user := range users {
-		db.Create(&user)
+		db.WithContext(ctx).Create(&user)
 	}
 
 	return nil
